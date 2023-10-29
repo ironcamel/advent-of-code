@@ -22,8 +22,8 @@ for (@lines) {
 say $sum;
 
 __END__
-# 12 - small input answer
-# 11618 - large input answer
+# 12 - input-small.txt answer
+# 11618 - input-large.txt answer
 
 A - rock
 B - paper
