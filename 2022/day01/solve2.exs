@@ -12,12 +12,13 @@ defmodule Main do
     |> String.split("\n")
     |> Enum.chunk_while([], chunk_fun, &{:cont, &1, []})
     |> Enum.map(&Enum.sum(&1))
-    |> Enum.max()
+    |> Enum.sort(:desc)
+    |> Enum.take(3)
+    |> Enum.sum()
   end
 end
 
 IO.puts(Main.go())
 
-# 24000 - input-small.txt answer
-# 72478 - input-large.txt answer
-
+# 45000 - input-small.txt answer
+# 210367 - input-large.txt answer
