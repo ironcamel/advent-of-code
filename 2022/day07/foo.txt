@@ -1,0 +1,21 @@
+$ cd /
+$ ls
+dir grdd
+270251 hjlvwtph.jzv
+230026 jzmgcj.gmd
+dir nns
+dir rrfflbql
+$ cd grdd
+$ ls
+233044 mqbz.fcp
+dir nnch
+82939 rgtvsqsh.psq
+150253 srvg.dth
+$ cd nnch
+$ ls
+4014 mqbz.fcp
+$ cd ..
+$ cd ..
+$ cd nns
+$ ls
+dir cgbdghtd
