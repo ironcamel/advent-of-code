@@ -76,7 +76,7 @@ sum_dir($fs, 0);
 
 p $fs;
 my $unused_space = 70_000_000 - $fs->{_dir_sum};
-my $need = 3_000_0000 - $unused_space;
+my $need = 30_000_000 - $unused_space;
 
 sub find_dir {
     my ($refs, $min) = @_;
