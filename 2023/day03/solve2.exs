@@ -2,23 +2,17 @@ defmodule Main do
   @unit_circle [{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}]
 
   def main() do
-    lines = parse_input("input-large.txt")
+    rows = parse_input("input-large.txt")
 
     schema =
-      lines
-      |> Enum.reduce(%{}, fn {line, i}, acc ->
-        line
-        |> String.codepoints()
-        |> Enum.with_index()
-        |> Enum.reduce(acc, fn {c, j}, acc2 -> Map.put(acc2, {i, j}, c) end)
+      Enum.reduce(rows, %{}, fn {row, i}, acc ->
+        Enum.reduce(row, acc, fn {c, j}, acc2 -> Map.put(acc2, {i, j}, c) end)
       end)
 
     parts_map =
-      lines
-      |> Enum.reduce([], fn {line, i}, acc ->
-        line
-        |> String.codepoints()
-        |> Enum.with_index()
+      rows
+      |> Enum.reduce([], fn {row, i}, acc ->
+        row
         |> Enum.chunk_by(fn {c, _j} -> is_d(c) end)
         |> Enum.filter(fn [{c, _j} | _] -> is_d(c) end)
         |> Enum.map(fn chunks ->
@@ -33,12 +27,9 @@ defmodule Main do
         end)
       end)
 
-    lines
-    |> Enum.filter(fn {line, _i} -> is_star(line) end)
-    |> Enum.reduce([], fn {line, i}, acc ->
-      line
-      |> String.codepoints()
-      |> Enum.with_index()
+    rows
+    |> Enum.reduce([], fn {row, i}, acc ->
+      row
       |> Enum.filter(fn {c, _j} -> is_star(c) end)
       |> Enum.map(fn {_c, j} -> {i, j} end)
       |> Enum.concat(acc)
@@ -53,8 +44,7 @@ defmodule Main do
           parts
           |> Enum.map(fn points ->
             points
-            |> Enum.map(fn point -> schema[point] end)
-            |> Enum.join("")
+            |> Enum.map_join(fn point -> schema[point] end)
             |> String.to_integer()
           end)
           |> Enum.product()
@@ -78,8 +68,15 @@ defmodule Main do
 
   def is_symbol(c), do: c && c =~ ~r/\D/ && c != "."
 
-  def parse_input(path),
-    do: path |> File.read!() |> String.split("\n", trim: true) |> Enum.with_index()
+  def parse_input(path) do
+    path
+    |> File.read!()
+    |> String.split("\n", trim: true)
+    |> Enum.with_index()
+    |> Enum.map(fn {line, i} ->
+      {line |> String.codepoints() |> Enum.with_index(), i}
+    end)
+  end
 end
 
 Main.main() |> IO.puts()
