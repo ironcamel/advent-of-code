@@ -6,14 +6,17 @@ defmodule Main do
   def process(cards, id) when id > map_size(cards), do: count_cards(cards)
 
   def process(cards, id) do
-    {win_set, nums, copies} = cards[id]
+    {win_set, nums, cnt} = cards[id]
     num_matches = Enum.count(nums, fn num -> MapSet.member?(win_set, num) end)
 
-    Enum.reduce(1..num_matches//1, cards, fn i, acc ->
-      {win_set, nums, copies2} = acc[id + i]
-      Map.put(acc, id + i, {win_set, nums, copies2 + copies})
-    end)
+    1..num_matches//1
+    |> Enum.reduce(cards, fn i, acc -> inc_card_cnt(acc, id + i, cnt) end)
     |> process(id + 1)
+  end
+
+  def inc_card_cnt(cards, id, inc) do
+    {win_set, nums, cnt} = cards[id]
+    Map.put(cards, id, {win_set, nums, cnt + inc})
   end
 
   def count_cards(cards), do: cards |> Enum.map(fn {_key, {_, _, cnt}} -> cnt end) |> Enum.sum()
