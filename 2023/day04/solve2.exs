@@ -1,6 +1,6 @@
 defmodule Main do
   def main() do
-    "input-large.txt" |> parse_input |> process(1)
+    "input-large.txt" |> parse_cards |> process(1)
   end
 
   def process(cards, id) when id > map_size(cards), do: count_cards(cards)
@@ -18,7 +18,7 @@ defmodule Main do
 
   def count_cards(cards), do: cards |> Enum.map(fn {_key, {_, _, cnt}} -> cnt end) |> Enum.sum()
 
-  def parse_input(path) do
+  def parse_cards(path) do
     path
     |> File.read!()
     |> String.split("\n", trim: true)
@@ -34,7 +34,7 @@ defmodule Main do
   end
 end
 
-Main.main() |> IO.inspect()
+Main.main() |> IO.puts()
 
 # 30 - input-small.txt answer
 # 15455663 - input-large.txt answer

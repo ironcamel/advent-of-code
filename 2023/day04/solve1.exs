@@ -1,7 +1,7 @@
 defmodule Main do
   def main() do
     "input-large.txt"
-    |> parse_input
+    |> parse_cards
     |> Enum.map(fn {win_set, my_nums} ->
       cnt = Enum.count(my_nums, fn num -> MapSet.member?(win_set, num) end)
       if cnt == 0, do: 0, else: 2 ** (cnt - 1)
@@ -9,7 +9,7 @@ defmodule Main do
     |> Enum.sum()
   end
 
-  def parse_input(path) do
+  def parse_cards(path) do
     path
     |> File.read!()
     |> String.split("\n", trim: true)
