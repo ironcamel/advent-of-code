@@ -4,32 +4,29 @@ defmodule Main do
 
     1..map_size(cards)
     |> Enum.reduce(cards, fn id, acc ->
-      {win_set, nums, cnt} = acc[id]
+      %{win_set: win_set, nums: nums, cnt: cnt} = acc[id]
       num_matches = Enum.count(nums, fn num -> MapSet.member?(win_set, num) end)
-      Enum.reduce(1..num_matches//1, acc, fn i, acc -> inc_card_cnt(acc, id + i, cnt) end)
+      Enum.reduce(1..num_matches//1, acc, fn i, acc -> inc_card_cnt(acc, acc[id + i], cnt) end)
     end)
     |> count_cards
   end
 
-  def inc_card_cnt(cards, id, inc) do
-    {win_set, nums, cnt} = cards[id]
-    Map.put(cards, id, {win_set, nums, cnt + inc})
-  end
+  def inc_card_cnt(cards, card, inc), do: Map.put(cards, card.id, %{card | cnt: card.cnt + inc})
 
-  def count_cards(cards), do: cards |> Enum.map(fn {_key, {_, _, cnt}} -> cnt end) |> Enum.sum()
+  def count_cards(cards), do: cards |> Map.values() |> Enum.map(& &1.cnt) |> Enum.sum()
 
   def parse_cards(path) do
     path
     |> File.read!()
     |> String.split("\n", trim: true)
     |> Enum.map(fn line ->
-      [id, winners, my_nums] = String.split(line, [":", "|"])
-      id = Regex.run(~r/\d+/, id) |> hd |> String.to_integer()
+      [id_label, winners, nums] = String.split(line, [":", "|"])
+      id = Regex.run(~r/\d+/, id_label) |> hd |> String.to_integer()
       win_set = winners |> String.split() |> MapSet.new()
-      {id, win_set, String.split(my_nums)}
+      {id, win_set, String.split(nums)}
     end)
-    |> Enum.reduce(%{}, fn {id, win, nums}, acc ->
-      Map.put(acc, id, {win, nums, 1})
+    |> Enum.reduce(%{}, fn {id, win_set, nums}, acc ->
+      Map.put(acc, id, %{id: id, win_set: win_set, nums: nums, cnt: 1})
     end)
   end
 end
