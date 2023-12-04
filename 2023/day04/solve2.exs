@@ -1,17 +1,14 @@
 defmodule Main do
   def main() do
-    "input-large.txt" |> parse_cards |> process(1)
-  end
+    cards = "input-large.txt" |> parse_cards
 
-  def process(cards, id) when id > map_size(cards), do: count_cards(cards)
-
-  def process(cards, id) do
-    {win_set, nums, cnt} = cards[id]
-    num_matches = Enum.count(nums, fn num -> MapSet.member?(win_set, num) end)
-
-    1..num_matches//1
-    |> Enum.reduce(cards, fn i, acc -> inc_card_cnt(acc, id + i, cnt) end)
-    |> process(id + 1)
+    1..map_size(cards)
+    |> Enum.reduce(cards, fn id, acc ->
+      {win_set, nums, cnt} = acc[id]
+      num_matches = Enum.count(nums, fn num -> MapSet.member?(win_set, num) end)
+      Enum.reduce(1..num_matches//1, acc, fn i, acc -> inc_card_cnt(acc, id + i, cnt) end)
+    end)
+    |> count_cards
   end
 
   def inc_card_cnt(cards, id, inc) do
