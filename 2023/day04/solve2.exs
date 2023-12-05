@@ -1,6 +1,6 @@
 defmodule Main do
   def main() do
-    cards = "input-large.txt" |> parse_cards
+    cards = parse_cards("input-large.txt")
 
     1..map_size(cards)
     |> Enum.reduce(cards, fn id, acc ->
