@@ -1,11 +1,10 @@
 defmodule Main do
-
   def main() do
     "input-large.txt" |> parse_input() |> ways_to_win()
   end
 
   def ways_to_win([t, record_d]) do
-    1..t |> Enum.count(fn speed -> speed * (t - speed) > record_d end)
+    Enum.count(1..t, fn speed -> speed * (t - speed) > record_d end)
   end
 
   def parse_input(path) do
