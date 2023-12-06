@@ -54,16 +54,6 @@ defmodule Main do
     end)
   end
 
-  def find_overlaps(data) do
-    for pair1 <- data.loc_humid, pair2 <- data.loc_humid, pair1 != pair2 do
-      {pair1, pair2}
-    end
-    |> Enum.filter(fn {{r1, _}, {r2, _}} -> not Range.disjoint?(r1, r2) end)
-    |> Enum.map(fn pairs -> pairs |> Tuple.to_list() |> Enum.sort() end)
-    |> Enum.uniq()
-    |> Enum.map(fn pairs -> pairs |> List.to_tuple() end)
-  end
-
   def find(x, data, key) do
     case data[key] |> Enum.find(fn {src_range, dest_range} -> x in src_range end) do
       # nil -> if key == :soil_seed, do: nil, else: x
