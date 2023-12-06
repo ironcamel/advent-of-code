@@ -1,30 +1,26 @@
 defmodule Main do
 
-  def main() do
-    #data = "input-small.txt" |> parse_input
-    data = "input-large.txt" |> parse_input
+  def main(input_path) do
+    data = parse_input(input_path)
 
     data.seeds
     |> Enum.map(fn seed ->
-      find(seed, data, :seed_soil)
-      |> find(data, :soil_fert)
-      |> find(data, :fert_water)
-      |> find(data, :water_light)
-      |> find(data, :light_temp)
-      |> find(data, :temp_humid)
-      |> find(data, :humid_loc)
+      seed
+      |> get_dest(data, :seed_soil)
+      |> get_dest(data, :soil_fert)
+      |> get_dest(data, :fert_water)
+      |> get_dest(data, :water_light)
+      |> get_dest(data, :light_temp)
+      |> get_dest(data, :temp_humid)
+      |> get_dest(data, :humid_loc)
     end)
     |> Enum.min()
   end
 
-  def find(x, data, key) do
-    case data[key] |> Enum.find(fn {src_range, dest_range} -> x in src_range end) do
-      nil -> x
-      {src_range, dest_range} ->
-        src_start.._last = src_range
-        dest_start.._last = dest_range
-        diff = x - src_start
-        dest_start + diff
+  def get_dest(src, data, key) do
+    case Enum.find(data[key], fn {src_range, _dest_range} -> src in src_range end) do
+      nil -> src
+      {src_start.._, dest_start.._} -> dest_start + (src - src_start)
     end
   end
 
@@ -35,10 +31,8 @@ defmodule Main do
       |> String.trim()
       |> String.split("\n")
 
-    seeds = lines |> hd |> String.split(": ") |> Enum.at(1) |> String.split() |> to_i
-
     %{
-      seeds: seeds,
+      seeds: lines |> hd |> String.split(": ") |> Enum.at(1) |> String.split() |> to_i,
       seed_soil: gen_map(lines, "seed-to-soil"),
       soil_fert: gen_map(lines, "soil-to-fertilizer"),
       fert_water: gen_map(lines, "fertilizer-to-water"),
@@ -50,12 +44,10 @@ defmodule Main do
   end
 
   def gen_map(lines, name) do
-    {_, lines} =
-      lines
-      |> Enum.split_while(fn line -> not String.starts_with?(line, name) end)
-
     lines
-    |> tl
+    |> Enum.split_while(fn line -> not String.starts_with?(line, name) end)
+    |> then(fn {_, lines} -> lines end)
+    |> tl()
     |> Enum.take_while(fn line -> line != "" end)
     |> Enum.map(fn line ->
       [dest, src, cnt] = String.split(line) |> to_i
@@ -63,16 +55,10 @@ defmodule Main do
     end)
   end
 
-  def to_i(list) when is_list(list) , do: Enum.map(list, &String.to_integer/1)
-  def to_i(s), do: String.to_integer(s)
-
-  def p(o, opts \\ []) do
-    IO.inspect(o, [charlists: :as_lists, limit: :infinity] ++ opts)
-  end
-
+  def to_i(list), do: Enum.map(list, &String.to_integer/1)
 end
 
-#Main.main() |> IO.inspect()
-Main.main() |> Main.p
+"input-large.txt" |> Main.main() |> IO.puts()
 
+# 35 - input-small.txt answer
 # 26273516 - input-large.txt answer
