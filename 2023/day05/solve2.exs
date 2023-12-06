@@ -1,9 +1,9 @@
+# WARNING ... this code is awful and takes about 50m to run on the large input
+# set, but it got me the star, and I'm all about that star life ...
+
 defmodule Main do
   def main() do
-    #data = "foo.txt" |> parse_input
     data = "input-small.txt" |> parse_input
-    #data = "input-large.txt" |> parse_input
-    #data = Map.put(data, :seeds, [79..79, 14..14, 55..55, 13..13])
 
     new_loc_humid =
       data.loc_humid
