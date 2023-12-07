@@ -24,7 +24,7 @@ defmodule Main do
 
   def upgrade_jokers(hand) do
     {jokers, hand} = hand |> Enum.sort() |> Enum.split_while(&(&1 == 1))
-    hand = hand |> Enum.chunk_by(& &1) |> Enum.map(&length(&1)) |> Enum.sort() |> Enum.reverse()
+    hand = hand |> Enum.frequencies() |> Map.values() |> Enum.sort() |> Enum.reverse()
     hand = if hand == [], do: [0], else: hand # handles case when hand is all jokers
     [largest_group | hand] = hand
     [largest_group + length(jokers) | hand]

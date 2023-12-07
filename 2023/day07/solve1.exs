@@ -11,7 +11,7 @@ defmodule Main do
   end
 
   def card_type(hand) do
-    case hand |> Enum.sort() |> Enum.chunk_by(& &1) |> Enum.map(&length(&1)) |> Enum.sort() do
+    case hand |> Enum.sort() |> Enum.frequencies() |> Map.values() |> Enum.sort() do
       [5] -> 5
       [1, 4] -> 4
       [2, 3] -> 3.5
