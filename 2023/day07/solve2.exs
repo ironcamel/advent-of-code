@@ -13,11 +13,11 @@ defmodule Main do
   def card_type(hand) do
     case upgrade_jokers(hand) do
       [5] -> 5
-      [1, 4] -> 4
-      [2, 3] -> 3.5
-      [1, 1, 3] -> 3
-      [1, 2, 2] -> 2
-      [1, 1, 1, 2] -> 1
+      [4, 1] -> 4
+      [3, 2] -> 3.5
+      [3, 1, 1] -> 3
+      [2, 2, 1] -> 2
+      [2, 1, 1, 1] -> 1
       _ -> 0.5
     end
   end
@@ -25,10 +25,10 @@ defmodule Main do
   def upgrade_jokers(hand) do
     {jokers, hand} = hand |> Enum.sort() |> Enum.split_while(&(&1 == 1))
     hand = hand |> Enum.chunk_by(& &1) |> Enum.map(&length(&1)) |> Enum.sort() |> Enum.reverse()
-    hand = if hand == [], do: [0], else: hand
+    hand = if hand == [], do: [0], else: hand # handles case when hand is all jokers
     [largest_group | hand] = hand
     num_jokers = length(jokers)
-    [largest_group + num_jokers | hand] |> Enum.reverse()
+    [largest_group + num_jokers | hand]
   end
 
   def card_val("A"), do: 14
