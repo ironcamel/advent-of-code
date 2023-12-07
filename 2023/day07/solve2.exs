@@ -1,39 +1,24 @@
 defmodule Main do
   def main() do
-    #hands = "input-large.txt" |> parse_input
-
-    #"foo.txt"
-    #"input-small.txt"
     "input-large.txt"
     |> parse_input()
-    |> p()
     |> Enum.sort(fn {hand_a, _, type_a}, {hand_b, _, type_b} ->
-      if type_a == type_b do
-        hand_a <= hand_b
-      else
-        type_a <= type_b
-      end
+      if type_a == type_b, do: hand_a <= hand_b, else: type_a <= type_b
     end)
-    |> p
     |> Enum.with_index(1)
     |> Enum.map(fn {{_hand, bid, _rank}, i} -> bid * i end)
     |> Enum.sum()
-
   end
 
   def card_type(hand) do
-    p hand
-    {hand, jokers} = hand |> Enum.sort(fn a, b -> a >= b end) |> Enum.split_while(&(&1 != 1)) |> dbg
-    chunk = fn hand, jokers ->
-      hand = hand |> Enum.chunk_by(& &1) |> Enum.map(&length(&1)) |> Enum.sort() |> Enum.reverse()
-      dbg
-      num_jokers = length(jokers)
-      hand = if hand == [], do: [0], else: hand
-      [head | hand] = hand
-      [head + num_jokers | hand] |> Enum.reverse()
-    end
+    {hand, jokers} = hand |> Enum.sort(fn a, b -> a >= b end) |> Enum.split_while(&(&1 != 1))
+    hand = hand |> Enum.chunk_by(& &1) |> Enum.map(&length(&1)) |> Enum.sort() |> Enum.reverse()
+    num_jokers = length(jokers)
+    hand = if hand == [], do: [0], else: hand
+    [largest_group | hand] = hand
+    groups = [largest_group + num_jokers | hand] |> Enum.reverse()
 
-    case chunk.(hand, jokers) do
+    case groups do
       [5] -> 5
       [1, 4] -> 4
       [2, 3] -> 3.5
@@ -57,25 +42,13 @@ defmodule Main do
     |> String.split("\n", trim: true)
     |> Enum.map(fn line ->
       [hand, bid] = String.split(line)
-      hand =
-        hand
-        |> String.codepoints()
-        |> Enum.map(fn c -> card_val(c) end)
-        #|> Enum.sort(fn a, b -> a >= b end)
-
+      hand = hand |> String.codepoints() |> Enum.map(fn c -> card_val(c) end)
       {hand, String.to_integer(bid), card_type(hand)}
     end)
   end
-
-  def p(o, opts \\ []) do
-    o
-    IO.inspect(o, [charlists: :as_lists, limit: :infinity] ++ opts)
-  end
-
 end
 
-Main.main() |> IO.inspect()
-#Main.main() |> Main.p()
+Main.main() |> IO.puts()
 
-# 6440 - input-small.txt answer
-# 249726565 - input-large.txt answer
+# 5905 - input-small.txt answer
+# 251135960 - input-large.txt answer
