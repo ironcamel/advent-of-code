@@ -27,8 +27,7 @@ defmodule Main do
     hand = hand |> Enum.chunk_by(& &1) |> Enum.map(&length(&1)) |> Enum.sort() |> Enum.reverse()
     hand = if hand == [], do: [0], else: hand # handles case when hand is all jokers
     [largest_group | hand] = hand
-    num_jokers = length(jokers)
-    [largest_group + num_jokers | hand]
+    [largest_group + length(jokers) | hand]
   end
 
   def card_val("A"), do: 14
