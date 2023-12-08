@@ -1,6 +1,6 @@
 defmodule Main do
   def main() do
-    {graph, steps} = "input-large.txt" |> parse_input
+    {graph, steps} = parse_input("input-large.txt")
     search(graph, steps, steps, "AAA", 1)
   end
 

@@ -1,45 +1,32 @@
 Mix.install([:math])
 
 defmodule Main do
-
   def main() do
-    #{graph, steps} = "input-small2.txt" |> parse_input
-    {graph, steps} = "input-large.txt" |> parse_input
+    {graph, steps} = parse_input("input-large.txt")
 
-    nodes = graph |> Map.keys() |> Enum.filter(fn node -> node =~ ~r/..A/ end)
-
-    nodes
-    |> Enum.map(fn node ->
-      search(graph, steps, steps, node, 1)
-    end)
-    #|> dbg()
-    |> Enum.reduce(fn x, acc ->
-      Math.lcm(x, acc)
-    end)
+    graph
+    |> Map.keys()
+    |> Enum.filter(fn node -> node =~ ~r/..A/ end)
+    |> Enum.map(fn node -> search(graph, steps, steps, node, 1) end)
+    |> Enum.reduce(fn x, acc -> Math.lcm(x, acc) end)
   end
 
-  #def search(graph, steps, orig_steps, _, 9), do: "oops"
+  def search(graph, [], orig_steps, node, cnt) do
+    search(graph, orig_steps, orig_steps, node, cnt)
+  end
 
-  def search(graph, steps, orig_steps, "ZZZ", cnt), do: cnt - 1
-
-  def search(graph, [], orig_steps, node, cnt), do: search(graph, orig_steps, orig_steps, node, cnt)
-
-  def search(graph, [ dir | steps], orig_steps, node, cnt) do
+  def search(graph, [dir | steps], orig_steps, node, cnt) do
     next = graph[node][dir]
-    #dbg()
+
     if next =~ ~r/..Z/ do
       cnt
     else
-      search(graph, steps, orig_steps, next, cnt+1)
+      search(graph, steps, orig_steps, next, cnt + 1)
     end
   end
 
   def parse_input(path) do
-    lines =
-      path
-      |> File.read!()
-      |> String.trim()
-      |> String.split("\n", trim: true)
+    lines = path |> File.read!() |> String.split("\n", trim: true)
 
     [steps | lines] = lines
     steps = String.codepoints(steps)
@@ -47,19 +34,17 @@ defmodule Main do
     graph =
       lines
       |> Enum.map(fn line ->
-        Regex.run(~r/(...) = \((...), (...)\)/, line) |> tl
+        Regex.run(~r/(...) = \((...), (...)\)/, line) |> tl()
       end)
-      |> Enum.reduce(%{}, fn [a, b, c], acc ->
-        Map.put(acc, a, %{"L" => b, "R" => c})
+      |> Enum.reduce(%{}, fn [node, l, r], acc ->
+        Map.put(acc, node, %{"L" => l, "R" => r})
       end)
 
     {graph, steps}
   end
-
-  def p(o, opts \\ []) do
-    IO.inspect(o, [charlists: :as_lists, limit: :infinity] ++ opts)
-  end
-
 end
 
-Main.main() |> IO.inspect()
+Main.main() |> IO.puts()
+
+# 6 - input-small2.txt answer
+# 22103062509257 - input-large.txt answer
