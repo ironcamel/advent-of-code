@@ -8,7 +8,7 @@ defmodule Main do
     |> Map.keys()
     |> Enum.filter(fn node -> node =~ ~r/..A/ end)
     |> Enum.map(fn node -> search(graph, steps, node) end)
-    |> Enum.reduce(fn x, acc -> Math.lcm(x, acc) end)
+    |> Enum.reduce(&Math.lcm(&1, &2))
   end
 
   def search(graph, steps, start) do
