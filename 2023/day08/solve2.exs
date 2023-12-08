@@ -7,40 +7,28 @@ defmodule Main do
     graph
     |> Map.keys()
     |> Enum.filter(fn node -> node =~ ~r/..A/ end)
-    |> Enum.map(fn node -> search(graph, steps, steps, node, 1) end)
+    |> Enum.map(fn node -> search(graph, steps, node) end)
     |> Enum.reduce(fn x, acc -> Math.lcm(x, acc) end)
   end
 
-  def search(graph, [], orig_steps, node, cnt) do
-    search(graph, orig_steps, orig_steps, node, cnt)
-  end
-
-  def search(graph, [dir | steps], orig_steps, node, cnt) do
-    next = graph[node][dir]
-
-    if next =~ ~r/..Z/ do
-      cnt
-    else
-      search(graph, steps, orig_steps, next, cnt + 1)
-    end
+  def search(graph, steps, start) do
+    steps
+    |> Stream.cycle()
+    |> Stream.scan(start, fn dir, node -> graph[node][dir] end)
+    |> Enum.find_index(fn node -> node =~ ~r/..Z/ end)
+    |> then(&(&1 + 1))
   end
 
   def parse_input(path) do
     lines = path |> File.read!() |> String.split("\n", trim: true)
-
     [steps | lines] = lines
-    steps = String.codepoints(steps)
 
     graph =
       lines
-      |> Enum.map(fn line ->
-        Regex.run(~r/(...) = \((...), (...)\)/, line) |> tl()
-      end)
-      |> Enum.reduce(%{}, fn [node, l, r], acc ->
-        Map.put(acc, node, %{"L" => l, "R" => r})
-      end)
+      |> Enum.map(fn line -> Regex.run(~r/(...) = \((...), (...)\)/, line) |> tl() end)
+      |> Enum.reduce(%{}, fn [node, l, r], acc -> Map.put(acc, node, %{"L" => l, "R" => r}) end)
 
-    {graph, steps}
+    {graph, String.codepoints(steps)}
   end
 end
 
