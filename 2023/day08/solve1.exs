@@ -1,36 +1,24 @@
 defmodule Main do
   def main() do
     {graph, steps} = parse_input("input-large.txt")
-    search(graph, steps, steps, "AAA", 1)
-  end
 
-  def search(_graph, _steps, _orig_steps, "ZZZ", cnt), do: cnt - 1
-
-  def search(graph, [], orig_steps, node, cnt) do
-    search(graph, orig_steps, orig_steps, node, cnt)
-  end
-
-  def search(graph, [dir | steps], orig_steps, node, cnt) do
-    next = graph[node][dir]
-    search(graph, steps, orig_steps, next, cnt + 1)
+    steps
+    |> Stream.cycle()
+    |> Stream.scan("AAA", fn dir, node -> graph[node][dir] end)
+    |> Enum.find_index(fn node -> node == "ZZZ" end)
+    |> then(&(&1 + 1))
   end
 
   def parse_input(path) do
     lines = path |> File.read!() |> String.split("\n", trim: true)
-
     [steps | lines] = lines
-    steps = String.codepoints(steps)
 
     graph =
       lines
-      |> Enum.map(fn line ->
-        Regex.run(~r/(...) = \((...), (...)\)/, line) |> tl()
-      end)
-      |> Enum.reduce(%{}, fn [node, l, r], acc ->
-        Map.put(acc, node, %{"L" => l, "R" => r})
-      end)
+      |> Enum.map(fn line -> Regex.run(~r/(...) = \((...), (...)\)/, line) |> tl() end)
+      |> Enum.reduce(%{}, fn [node, l, r], acc -> Map.put(acc, node, %{"L" => l, "R" => r}) end)
 
-    {graph, steps}
+    {graph, String.codepoints(steps)}
   end
 end
 
