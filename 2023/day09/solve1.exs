@@ -10,15 +10,9 @@ defmodule Main do
 
   def process_row(row, acc) do
     if Enum.all?(row, fn x -> x == 0 end) do
-      acc
-      |> Enum.map(&List.last/1)
-      |> Enum.sum()
+      acc |> Enum.map(&List.last/1) |> Enum.sum()
     else
-      new_row =
-        row
-        |> Enum.chunk_every(2, 1, :discard)
-        |> Enum.map(fn [x, y] -> y - x end)
-
+      new_row = row |> Enum.chunk_every(2, 1, :discard) |> Enum.map(fn [x, y] -> y - x end)
       process_row(new_row, [new_row | acc])
     end
   end
