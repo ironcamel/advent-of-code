@@ -1,7 +1,6 @@
 defmodule Main do
   def main() do
-    #graph = parse_input("input-large.txt")
-    graph = parse_input("input-small.txt")
+    graph = parse_input("input-large.txt")
     {start, _} = graph |> Enum.find(fn {key, _val} -> graph[key].type == "S" end)
     cnt = dfs(graph, start)
     ceil(cnt / 2)
@@ -27,8 +26,8 @@ defmodule Main do
     src_type = graph[key].type
 
     if src_type in src_types && graph[next_key] && graph[next_key].type in target_types,
-       do: next_key,
-       else: nil
+      do: next_key,
+      else: nil
   end
 
   def n(graph, {i, j} = key) do
@@ -50,7 +49,6 @@ defmodule Main do
     next_key = {i, j - 1}
     check_types(graph, key, next_key, ["S", "J", "7", "-"], ["F", "L", "-", "S"])
   end
-
 
   def next_pipes(graph, key) do
     [n(graph, key), s(graph, key), e(graph, key), w(graph, key)] |> Enum.filter(& &1)
