@@ -8,7 +8,7 @@ defmodule Main do
       |> Enum.map(fn {key, _c} -> key end)
       |> Enum.sort()
 
-    (for g1 <- galaxies, g2 <- galaxies, do: [g1, g2])
+    for(g1 <- galaxies, g2 <- galaxies, do: [g1, g2])
     |> Enum.map(fn pair -> Enum.sort(pair) end)
     |> Enum.filter(fn [a, b] -> a != b end)
     |> Enum.uniq()
@@ -22,7 +22,7 @@ defmodule Main do
       num_rows = Enum.count(empty_rows, fn i -> i in x_range end)
       num_cols = Enum.count(empty_cols, fn j -> j in y_range end)
       exp_factor = 1_000_000 - 1
-      x_diff + y_diff + (num_rows * exp_factor) + (num_cols * exp_factor)
+      x_diff + y_diff + num_rows * exp_factor + num_cols * exp_factor
     end)
     |> Enum.sum()
   end
