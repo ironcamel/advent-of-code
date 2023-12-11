@@ -57,7 +57,7 @@ defmodule Main do
   end
 end
 
-Main.main() |> IO.inspect()
+Main.main() |> IO.puts()
 
 # 82000210 - input-small.txt answer
 # 382979724122 - input-large.txt answer

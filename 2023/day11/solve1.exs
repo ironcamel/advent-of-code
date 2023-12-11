@@ -1,9 +1,6 @@
 defmodule Main do
-
   def main() do
-    # lines = "input-large.txt" |> parse_input
-    #{graph, empty_rows, empty_cols} = "input-small.txt" |> parse_input
-    {graph, empty_rows, empty_cols} = "input-large.txt" |> parse_input
+    {graph, empty_rows, empty_cols} = parse_input("input-large.txt")
 
     galaxies =
       graph
@@ -11,41 +8,31 @@ defmodule Main do
       |> Enum.map(fn {key, _c} -> key end)
       |> Enum.sort()
 
-    for g1 <- galaxies, g2 <- galaxies do
-      {g1, g2}
-    end
+    for(g1 <- galaxies, g2 <- galaxies, do: {g1, g2})
     |> Enum.map(fn pair -> pair |> Tuple.to_list() |> Enum.sort() end)
     |> Enum.filter(fn [a, b] -> a != b end)
     |> Enum.uniq()
     |> Enum.map(fn [{ai, aj}, {bi, bj}] ->
-      x_diff = abs(ai - bi)
-      y_diff = abs(aj - bj)
       [ai, bi] = Enum.sort([ai, bi])
+      x_diff = bi - ai
       x_range = ai..bi
       [aj, bj] = Enum.sort([aj, bj])
+      y_diff = bj - aj
       y_range = aj..bj
       num_rows = empty_rows |> Enum.count(fn i -> i in x_range end)
       num_cols = empty_cols |> Enum.count(fn j -> j in y_range end)
       x_diff + y_diff + num_rows + num_cols
     end)
     |> Enum.sum()
-    #|> length()
-
   end
 
   def parse_input(path) do
-
-    lines =
-      path
-      |> File.read!()
-      |> String.trim()
-      |> String.split("\n", trim: true)
+    lines = path |> File.read!() |> String.trim() |> String.split("\n", trim: true)
 
     graph =
       lines
       |> Enum.with_index()
       |> Enum.flat_map(fn {line, i} ->
-        #{line |> String.codepoints() |> Enum.with_index(), i}
         line |> String.codepoints() |> Enum.with_index() |> Enum.map(fn {c, j} -> {i, j, c} end)
       end)
       |> Enum.reduce(%{}, fn {i, j, c}, acc -> Map.put(acc, {i, j}, c) end)
@@ -67,14 +54,9 @@ defmodule Main do
 
     {graph, empty_rows, empty_cols}
   end
-
-  def p(o, opts \\ []) do
-    IO.inspect(o, [charlists: :as_lists, limit: :infinity] ++ opts)
-  end
-
 end
 
-Main.main() |> IO.inspect()
+Main.main() |> IO.puts()
 
 # 374 - input-small.txt answer
 # 10490062 - input-large.txt answer
