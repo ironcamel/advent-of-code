@@ -1,3 +1,66 @@
+# The trick I used to solve day 10 part 2 was to “stretch” the input data to
+# guarantee that there will be space everywhere inside of the loop. Consider a
+# loop which has no space inside such as:
+#
+# ╔╗
+# ║║
+# ╚╝
+#
+# You would convert that to:
+#
+# ......
+# .╔══╗.
+# .║..║.
+# .║..║.
+# .║..║.
+# .║..║.
+# .║..║.
+# .╚══╝.
+# ......
+#
+# You can do this by expanding every 1x1 unit into a 3x3 unit. For example,
+# given a vertical pipe, convert it like so:
+#
+#      .║.
+# ║ => .║.
+#      .║.
+#
+# A dot becomes a 3x3 grid of dots:
+#
+#      ...
+# . => ...
+#      ...
+#
+# Corners get converted like so:
+#
+#      ...
+# ╔ => .╔.
+#      .║.
+#
+# Once you have converted the data, do one DFS with the provided starting point
+# to find the loop. Now pick any point that is not part of the loop.
+#
+# There are only 2 possibilities. You either picked a point outside of the loop
+# (such as A) or a point inside of the loop (such as B):
+#
+# ......
+# .╔══╗.
+# A║..║.
+# .║..║.
+# .║.B║.
+# .║..║.
+# .║..║.
+# .╚══╝.
+# ......
+#
+# Now do a DFS using the point that you picked. If your DFS search caused you
+# to traverse the edge of your graph, then you know you were outside of the
+# loop.  In that case, you just do one more DFS starting with any point that
+# you haven’t visited yet. This DFS search will be guaranteed to traverse the
+# entirety of the inside of the loop. Then you just count the number of nodes
+# your last DFS visited (taking into account the “stretching”) to solve the
+# puzzle.
+#
 defmodule Main do
   def main() do
     graph = "input-large.txt" |> parse_input
