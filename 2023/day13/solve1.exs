@@ -1,5 +1,4 @@
 defmodule Main do
-
   def main() do
     "input-large.txt"
     |> parse_input()

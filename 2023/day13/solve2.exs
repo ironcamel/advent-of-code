@@ -1,5 +1,4 @@
 defmodule Main do
-
   def main() do
     "input-large.txt"
     |> parse_input()
@@ -26,10 +25,12 @@ defmodule Main do
   def compare(part1, part2, diff \\ 0)
   def compare(_part1, _part2, 2), do: 2
   def compare([], [], diff), do: diff
+
   def compare([row1 | part1], [row2 | part2], diff) do
     new_diff = compare(row1, row2, diff)
     compare(part1, part2, new_diff)
   end
+
   def compare(c1, c2, diff) when c1 == c2, do: diff
   def compare(_c1, _c2, diff), do: diff + 1
 
