@@ -1,38 +1,14 @@
 defmodule Main do
 
   def main() do
-    halls = "input-small.txt" |> parse_input
-    #halls = "input-large.txt" |> parse_input
-    #halls = "foo.txt" |> parse_input
-
-    halls
-    |> Enum.with_index
-    |> Enum.map(fn {hall, i} ->
-      find_reflection(hall)
-    end)
+    "input-large.txt"
+    |> parse_input()
+    |> Enum.map(fn hall -> find_reflection(hall) end)
     |> Enum.sum()
-
   end
-
-  def print(rows) do
-    rows
-    |> Enum.map(&Enum.join/1)
-    |> Enum.join("\n")
-    |> IO.puts
-
-    p("---")
-  end
-
-  #def find_reflection({rows, cols}), do: find_reflection(cols)
 
   def find_reflection({rows, cols}) do
-    #print rows
-    i = find_reflection(rows)
-    if i do
-      100 * i
-    else
-      find_reflection(cols)
-    end
+    find_reflection(cols) || 100 * find_reflection(rows)
   end
 
   def find_reflection(rows) do
@@ -44,7 +20,6 @@ defmodule Main do
     n = Enum.min([i, length(rows) - i])
     part1 = rows |> Enum.drop(i - n) |> Enum.take(n)
     part2 = rows |> Enum.drop(i) |> Enum.take(n) |> Enum.reverse()
-    #dbg
     compare(part1, part2) == 1
   end
 
@@ -53,10 +28,8 @@ defmodule Main do
   def compare([], [], diff), do: diff
   def compare([row1 | part1], [row2 | part2], diff) do
     new_diff = compare(row1, row2, diff)
-    #dbg()
     compare(part1, part2, new_diff)
   end
-
   def compare(c1, c2, diff) when c1 == c2, do: diff
   def compare(_c1, _c2, diff), do: diff + 1
 
@@ -71,14 +44,9 @@ defmodule Main do
       {rows, cols}
     end)
   end
-
-  def p(o, opts \\ []) do
-    IO.inspect(o, [charlists: :as_lists, limit: :infinity] ++ opts)
-  end
-
 end
 
-Main.main() |> Main.p
+Main.main() |> IO.puts()
 
 # 400 - input-small.txt answer
 # 31539 - input-large.txt answer
