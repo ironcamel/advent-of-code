@@ -1,8 +1,8 @@
 defmodule Main do
 
   def main() do
-    #halls = "input-small.txt" |> parse_input
-    halls = "input-large.txt" |> parse_input
+    halls = "input-small.txt" |> parse_input
+    #halls = "input-large.txt" |> parse_input
     #halls = "foo.txt" |> parse_input
 
     halls
@@ -80,4 +80,5 @@ end
 
 Main.main() |> Main.p
 
+# 400 - input-small.txt answer
 # 31539 - input-large.txt answer
