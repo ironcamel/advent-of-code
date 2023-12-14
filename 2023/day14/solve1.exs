@@ -7,16 +7,15 @@ defmodule Main do
     #
 
     #num_rows = graph |> Enum.map(fn {i, j} -> i end) |> Enum.max() |> then(&(&1 + 1))
-    max_i = graph |> Enum.map(fn {{i, j}, _} -> i end) |> Enum.max()
+    max_i = graph |> Enum.map(fn {{i, _j}, _} -> i end) |> Enum.max()
     num_rows = max_i + 1
 
     tilt(graph)
     #|> print(max_i)
     |> Enum.map(fn {{i, _j}, val} ->
-      if val == "O" do
-        num_rows - i
-      else
-        0
+      case val do
+        "O" -> num_rows - i
+        _ -> 0
       end
     end)
     |> Enum.sum()
@@ -64,7 +63,7 @@ defmodule Main do
   def print(graph, max_i) do
     0..max_i
     |> Enum.each(fn i ->
-      graph |> Enum.filter(fn {{i2, j}, _} -> i2 == i end) |> Enum.sort()
+      graph |> Enum.filter(fn {{i2, _j}, _} -> i2 == i end) |> Enum.sort()
       |> Enum.map(fn {_, val} -> val end) |> Enum.join() |> IO.puts
     end)
     graph
