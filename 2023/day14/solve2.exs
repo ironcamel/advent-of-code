@@ -1,18 +1,18 @@
 defmodule Main do
   def main() do
     {graph, num_rows} = parse_input("input-large.txt")
-
     {graph, cnt1, cnt2} = find_cycle(graph)
     iterations_left = rem(1_000_000_000 - cnt1, cnt2 - cnt1)
 
     1..iterations_left
     |> Enum.reduce(graph, fn _, acc -> tilt(acc) end)
-    |> Enum.map(fn {{i, _j}, val} ->
-      case val do
-        "O" -> num_rows - i
-        _ -> 0
-      end
-    end)
+    |> score(num_rows)
+  end
+
+  def score(graph, num_rows) do
+    graph
+    |> Enum.filter(fn {_key, val} -> val == "O" end)
+    |> Enum.map(fn {{i, _j}, _val} -> num_rows - i end)
     |> Enum.sum()
   end
 
@@ -41,11 +41,21 @@ defmodule Main do
         tilt(acc, key, val, dir)
       end)
 
-    # if new_graph == graph do
     if Map.equal?(new_graph, graph) do
       graph
     else
       tilt(new_graph, dir)
+    end
+  end
+
+  def tilt(graph, {i, j}, val, dir) do
+    target_key = key_for({i, j}, dir)
+    target = graph[target_key]
+
+    if val == "O" and target == "." do
+      graph |> Map.put(target_key, "O") |> Map.put({i, j}, ".")
+    else
+      graph
     end
   end
 
@@ -64,17 +74,6 @@ defmodule Main do
   def key_for({i, j}, :s), do: {i + 1, j}
   def key_for({i, j}, :w), do: {i, j - 1}
   def key_for({i, j}, :e), do: {i, j + 1}
-
-  def tilt(graph, {i, j}, val, dir) do
-    target_key = key_for({i, j}, dir)
-    target = graph[target_key]
-
-    if val == "O" and target == "." do
-      graph |> Map.put(target_key, "O") |> Map.put({i, j}, ".")
-    else
-      graph
-    end
-  end
 
   def parse_input(path) do
     lines =

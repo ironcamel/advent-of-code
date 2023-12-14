@@ -1,8 +1,11 @@
 defmodule Main do
   def main() do
     {graph, num_rows} = parse_input("input-large.txt")
+    graph |> tilt() |> score(num_rows)
+  end
 
-    tilt(graph)
+  def score(graph, num_rows) do
+    graph
     |> Enum.filter(fn {_key, val} -> val == "O" end)
     |> Enum.map(fn {{i, _j}, _val} -> num_rows - i end)
     |> Enum.sum()
@@ -12,17 +15,13 @@ defmodule Main do
     new_graph =
       graph
       |> Enum.sort()
-      |> Enum.reduce(graph, fn {key, val}, acc ->
-        tilt(acc, key, val)
-      end)
+      |> Enum.reduce(graph, fn {key, val}, acc -> tilt(acc, key, val) end)
 
     if new_graph == graph, do: graph, else: tilt(new_graph)
   end
 
   def tilt(graph, {i, j}, val) do
-    target = graph[{i - 1, j}]
-
-    if val == "O" and target == "." do
+    if val == "O" and graph[{i - 1, j}] == "." do
       graph |> Map.put({i - 1, j}, "O") |> Map.put({i, j}, ".")
     else
       graph
