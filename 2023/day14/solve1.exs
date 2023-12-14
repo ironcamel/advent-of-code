@@ -12,7 +12,7 @@ defmodule Main do
 
     tilt(graph)
     #|> print(max_i)
-    |> Enum.map(fn {{i, j}, %{val: val}} ->
+    |> Enum.map(fn {{i, _j}, val} ->
       if val == "O" do
         num_rows - i
       else
@@ -26,8 +26,8 @@ defmodule Main do
     new_graph =
       graph
       |> Enum.sort()
-      |> Enum.reduce(graph, fn {{i, j}, %{val: val}} = node, acc ->
-        tilt(acc, {i, j}, val)
+      |> Enum.reduce(graph, fn {key, val}, acc ->
+        tilt(acc, key, val)
       end)
     if new_graph == graph do
       graph
@@ -36,12 +36,12 @@ defmodule Main do
     end
   end
 
-  def tilt(graph, {i, j} = node, val) do
-    target = graph[{i - 1, j}] && graph[{i - 1, j}].val
+  def tilt(graph, {i, j}, val) do
+    target = graph[{i - 1, j}]
     if val == "O" and target == "." do
       graph
-      |> Map.put({i - 1, j}, %{val: "O"})
-      |> Map.put({i, j}, %{val: "."})
+      |> Map.put({i - 1, j}, "O")
+      |> Map.put({i, j}, ".")
     else
       graph
     end
@@ -57,7 +57,7 @@ defmodule Main do
       line |> Enum.with_index() |> Enum.map(fn {val, j} -> {i, j, val} end)
     end)
     |> Enum.reduce(%{}, fn {i, j, val}, acc ->
-      Map.put(acc, {i, j}, %{val: val, i: i, j: j})
+      Map.put(acc, {i, j}, val)
     end)
   end
 
@@ -65,7 +65,7 @@ defmodule Main do
     0..max_i
     |> Enum.each(fn i ->
       graph |> Enum.filter(fn {{i2, j}, _} -> i2 == i end) |> Enum.sort()
-      |> Enum.map(fn {_, %{val: val}} -> val end) |> Enum.join() |> IO.puts
+      |> Enum.map(fn {_, val} -> val end) |> Enum.join() |> IO.puts
     end)
     graph
   end
