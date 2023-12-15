@@ -3,12 +3,11 @@ defmodule Main do
     "input-large.txt"
     |> parse_input()
     |> Enum.reduce(%{}, fn cmd, acc -> do_cmd(cmd, acc) end)
-    |> Enum.map(fn {key, list} ->
+    |> Enum.flat_map(fn {key, list} ->
       list
       |> Enum.reverse()
       |> Enum.with_index(1)
       |> Enum.map(fn {{_, n}, i} -> (key + 1) * i * String.to_integer(n) end)
-      |> Enum.sum()
     end)
     |> Enum.sum()
   end
