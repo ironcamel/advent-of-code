@@ -12,14 +12,14 @@ defmodule Main do
     |> Enum.sum()
   end
 
-  def do_cmd(cmd, map \\ %{}) do
+  def do_cmd(cmd, map) do
     case Regex.run(~r/(.+)=(\d)/, cmd) do
-      [_, key, n] -> do_cmd(key, :put, n, map)
-      _ -> cmd |> String.trim("-") |> do_cmd(:del, map)
+      [_, key, n] -> put(map, key, n)
+      _ -> del(map, String.trim(cmd, "-"))
     end
   end
 
-  def do_cmd(key, :put, n, map) do
+  def put(map, key, n) do
     key_hash = hash(key)
     val = {key, n}
     list = map[key_hash]
@@ -37,7 +37,7 @@ defmodule Main do
     end
   end
 
-  def do_cmd(key, :del, map) do
+  def del(map, key) do
     key_hash = hash(key)
     list = map[key_hash]
 
