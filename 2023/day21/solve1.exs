@@ -7,41 +7,38 @@ defmodule Main do
     start = grid |> Enum.find(fn {_k, v} -> v == "S" end) |> elem(0)
 
     walk(grid, start)
-    #|> print
-    |> Enum.filter(fn {_k, v} -> v == "O" end)
-    |> Enum.count
+    |> Map.values()
+    |> Enum.sum()
   end
 
-  def walk(grid, start) do
-    walk(grid, [start], 0)
+  def walk(_grid, _points, vals, 64), do: vals
+
+  def walk(grid, point) do
+    walk(grid, [point], %{}, 0)
   end
 
-  def walk(grid, _, 64), do: grid
-
-  def walk(grid, sources, cnt) do
-    dots = sources |> Enum.map(fn point -> {point, "."} end) |> Map.new
-    grid = Map.merge(grid, dots)
-
-    new_points =
-      sources
+  def walk(grid, points, vals, cnt) do
+    zeros = points |> Enum.map(fn point -> {point, 0} end) |> Map.new
+    vals = Map.merge(vals, zeros)
+    ones =
+      points
       |> Enum.flat_map(fn point -> get_new_points(grid, point) end)
-      |> Enum.map(fn point -> {point, "O"} end)
+      |> Enum.map(fn point -> {point, 1} end)
       |> Map.new
 
-    grid = Map.merge(grid, new_points)
+    vals = Map.merge(vals, ones)
 
-    new_sources = grid |> Enum.filter(fn {_k, v} -> v == "O" end) |> Enum.map(&elem(&1, 0))
-    #dbg
-    walk(grid, new_sources, cnt + 1)
+    new_sources = vals |> Enum.filter(fn {_k, v} -> v == 1 end) |> Enum.map(&elem(&1, 0))
+    walk(grid, new_sources, vals, cnt + 1)
   end
 
   def get_new_points(grid, point) do
       @unit_circle
-      |> Enum.map(fn delta -> add_tuples(point, delta) end)
+      |> Enum.map(fn delta -> add_points(point, delta) end)
       |> Enum.filter(fn p -> grid[p] && grid[p] != "#" end)
   end
 
-  def add_tuples({i1, j1}, {i2, j2}), do: {i1 + i2, j1 + j2}
+  def add_points({i1, j1}, {i2, j2}), do: {i1 + i2, j1 + j2}
 
   def print(grid) do
     {{max_i, max_j}, _} = Enum.max(grid)
@@ -75,3 +72,5 @@ defmodule Main do
 end
 
 Main.main() |> Main.p
+
+# 3748
