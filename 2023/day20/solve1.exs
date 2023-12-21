@@ -4,7 +4,7 @@ defmodule Main do
     #{modules, listeners} = "input-small.txt" |> parse_input()
     #{modules, listeners} = "input-small2.txt" |> parse_input()
     {modules, listeners} = "input-large.txt" |> parse_input()
-    dbg
+    #dbg
 
     #modules = push_button(listeners) |> process(modules) |> dbg
     #push_button(listeners) |> process(modules)
@@ -13,10 +13,12 @@ defmodule Main do
       #1..1
       1..1000
       |> Enum.reduce(modules, fn _i, acc ->
-        dbg
-        push_button(listeners) |> process(acc)
+        #dbg
+        {acc, signals} = push_button(acc, listeners)
+        process(signals, acc)
       end)
-    (modules.low_cnt + 1000) * modules.high_cnt
+    #(modules.low_cnt + 1000) * modules.high_cnt
+    modules.low_cnt * modules.high_cnt
   end
 
   def handle_signal(modules, nil), do: {modules, nil}
@@ -66,7 +68,6 @@ defmodule Main do
 
   def process([signal | signals], modules) do
     {modules, new_signal} = handle_signal(modules, signal)
-    #dbg
     new_signals = split_signal(new_signal)
     process(signals ++ new_signals, modules)
   end
@@ -76,8 +77,9 @@ defmodule Main do
     Enum.map(targets, fn to -> {val, from, to} end)
   end
 
-  def push_button(listeners) do
-    listeners |> Enum.map(fn name -> {0, nil, name} end)
+  def push_button(modules, listeners) do
+    modules = %{modules | low_cnt: modules.low_cnt + 1}
+    {modules, listeners |> Enum.map(fn name -> {0, nil, name} end)}
   end
 
   def parse_input(path) do
@@ -119,7 +121,7 @@ defmodule Main do
   end
 
   def p(o, opts \\ []) do
-    IO.inspect(o, [charlists: :as_lists, limit: :infinity] ++ opts)
+    #IO.inspect(o, [charlists: :as_lists, limit: :infinity] ++ opts)
     o
   end
 end
