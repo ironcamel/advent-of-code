@@ -25,4 +25,4 @@ defmodule Main do
   end
 end
 
-Main.main() |> IO.inspect()
+Main.main() |> Main.p()
