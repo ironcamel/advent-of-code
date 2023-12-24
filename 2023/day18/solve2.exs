@@ -1,3 +1,4 @@
+# This uses https://en.wikipedia.org/wiki/Shoelace_formula
 defmodule Main do
   def main() do
     {vertices, perimeter} = "input-large.txt" |> parse_input()
