@@ -14,6 +14,7 @@ defmodule Main do
   #def karger(graph), do: karger(graph, graph |> Map.values |> hd |> Map.values |> hd)
   #def karger(graph, cut_size) when cut_size == 3, do: graph
 
+  # https://en.wikipedia.org/wiki/Karger%27s_algorithm
   def karger(graph) do
     new_graph = contract(graph)
     cut_size = new_graph |> Map.values |> hd |> Map.values |> hd
@@ -95,7 +96,7 @@ defmodule Main do
   end
 end
 
-Main.main() |> Main.p()
+Main.main() |> IO.puts()
 
 # 54 - input-small.txt answer
 # 600225 - input-large.txt answer
