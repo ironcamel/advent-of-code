@@ -11,10 +11,8 @@ defmodule Main do
 
   end
 
-  #def karger(graph), do: karger(graph, graph |> Map.values |> hd |> Map.values |> hd)
-  #def karger(graph, cut_size) when cut_size == 3, do: graph
-
   # https://en.wikipedia.org/wiki/Karger%27s_algorithm
+  # https://web.stanford.edu/class/archive/cs/cs161/cs161.1172/CS161Lecture16.pdf
   def karger(graph) do
     new_graph = contract(graph)
     cut_size = new_graph |> Map.values |> hd |> Map.values |> hd
