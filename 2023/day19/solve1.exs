@@ -1,6 +1,6 @@
 defmodule Main do
   def main() do
-    {toys, workflows} = "input-large.txt" |> parse_input()
+    {toys, workflows} = parse_input("input-large.txt")
 
     toys
     |> Enum.filter(fn toy -> check_rules(workflows, toy) end)
