@@ -62,5 +62,5 @@ end
 
 Main.main() |> IO.puts()
 
-# 21 input-small.txt answer
+# 21 - input-small.txt answer
 # 7221 - input-large.txt answer

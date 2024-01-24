@@ -1,4 +1,8 @@
+Mix.install [:memoize]
+
 defmodule Main do
+  use Memoize
+
   def main() do
     "input-large.txt"
     |> parse_input()
@@ -6,11 +10,10 @@ defmodule Main do
     |> Enum.sum()
   end
 
-  def calc([], []), do: 1
-  def calc([], _sizes), do: 0
-  def calc(record, []), do: if(Enum.any?(record, &(&1 == "#")), do: 0, else: 1)
-
-  def calc(record, sizes) do
+  defmemo calc([], []), do: 1
+  defmemo calc([], _sizes), do: 0
+  defmemo calc(record, []), do: if(Enum.any?(record, &(&1 == "#")), do: 0, else: 1)
+  defmemo calc(record, sizes) do
     case hd(record) do
       "#" -> handle_hash(record, sizes)
       "." -> calc(tl(record), sizes)
@@ -41,17 +44,13 @@ defmodule Main do
 
   def parse_line(line) do
     [springs, counts] = String.split(line)
-    springs = springs |> String.replace(~r/\.+/, ".") |> String.codepoints()
-    counts = counts |> String.split(",") |> Enum.map(&String.to_integer/1)
+    springs = springs |> String.replace(~r/\.+/, ".") |> List.duplicate(5) |> Enum.join("?") |> String.codepoints
+    counts = counts |> String.split(",") |> Enum.map(&String.to_integer/1) |> List.duplicate(5) |> List.flatten
     {springs, counts}
-  end
-
-  def p(o, opts \\ []) do
-    IO.inspect(o, [charlists: :as_lists, limit: :infinity] ++ opts)
   end
 end
 
-Main.main() |> IO.inspect()
+Main.main() |> IO.puts()
 
-# 21 input-small.txt answer
-# 7221 - input-large.txt answer
+# 525152 - input-small.txt answer
+# 7139671893722 - input-large.txt answer
