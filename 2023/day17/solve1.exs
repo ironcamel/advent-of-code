@@ -20,7 +20,7 @@ defmodule Main do
   end
 
   def dijkstra(grid) do
-    start_node = {{0, 0}, @east, 3}
+    start_node = {{0, 0}, @east, 0}
     dist = %{start_node => 0}
     prev = %{}
     visited = MapSet.new()
