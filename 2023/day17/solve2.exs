@@ -13,7 +13,7 @@ defmodule Main do
     {target, _} = Enum.max(grid)
 
     dijkstra(grid)
-    |> Enum.filter(fn {{n, _, _}, _val} -> n == target end)
+    |> Enum.filter(fn {{n, _, steps}, _val} -> n == target and steps >= 4 end)
     |> Enum.map(fn {_node, val} -> val end)
     |> Enum.min()
   end
@@ -67,15 +67,15 @@ defmodule Main do
   end
 
   def get_neighbors(grid, {point, dir, steps}) do
-    left = @left_of[dir]
-    right = @right_of[dir]
-
-    [
-      {add_tuples(point, dir), dir, steps + 1},
-      {add_tuples(point, left), left, 1},
-      {add_tuples(point, right), right, 1}
-    ]
-    |> Enum.filter(fn {np, _nd, steps} -> grid[np] && steps <= 3 end)
+    if steps >= 4 do
+      left = @left_of[dir]
+      right = @right_of[dir]
+      [{add_tuples(point, left), left, 1}, {add_tuples(point, right), right, 1}]
+    else
+      []
+    end
+    |> Enum.concat([{add_tuples(point, dir), dir, steps + 1}])
+    |> Enum.filter(fn {np, _nd, steps} -> grid[np] && steps <= 10 end)
   end
 
   def add_tuples({i1, j1}, {i2, j2}), do: {i1 + i2, j1 + j2}
@@ -98,5 +98,5 @@ end
 
 Main.main() |> IO.puts()
 
-# 102 - input-small.txt answer
-# 674 - input-large.txt answer
+# 94 - input-small.txt answer
+# 773 - input-large.txt answer
