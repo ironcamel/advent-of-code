@@ -2,24 +2,17 @@ defmodule Main do
   def main() do
     graph = parse_input("input-large.txt")
     {start, _} = graph |> Enum.find(fn {key, _val} -> graph[key].type == "S" end)
-    cnt = dfs(graph, start)
+    cnt = dfs(graph, [start]) |> MapSet.size()
     ceil(cnt / 2)
   end
 
-  def dfs(graph, node) do
-    children = next_pipes(graph, node) |> Enum.take(1)
-    dfs(graph, children, MapSet.new([node]), 0)
-  end
+  def dfs(graph, nodes, visited \\ MapSet.new())
+  def dfs(_graph, [], visited), do: visited
 
-  def dfs(_graph, [], _visited, cnt), do: cnt
-
-  def dfs(graph, [node | nodes], visited, cnt) do
+  def dfs(graph, [node | nodes], visited) do
     visited = MapSet.put(visited, node)
-
-    children =
-      next_pipes(graph, node) |> Enum.filter(fn node -> not MapSet.member?(visited, node) end)
-
-    dfs(graph, children ++ nodes, visited, cnt + 1)
+    children = next_pipes(graph, node) |> Enum.reject(&MapSet.member?(visited, &1))
+    dfs(graph, children ++ nodes, visited)
   end
 
   def check_types(graph, key, next_key, src_types, target_types) do
