@@ -2,19 +2,19 @@ defmodule Main do
   def main() do
     parse_input("input-large.txt")
     |> dfs()
-    |> Enum.map(&(List.flatten(&1)))
+    |> Enum.map(&List.flatten(&1))
     |> Enum.map(fn rules -> Enum.map(rules, &to_range(&1)) end)
     |> Enum.map(fn rules -> combine(rules) end)
     |> Enum.map(fn rules -> Map.new(rules) end)
     |> Enum.map(fn rule_map -> count_combos(rule_map) end)
-    |> Enum.sum
+    |> Enum.sum()
   end
 
   def count_combos(rule_map) do
     rule_map
-    |> Map.values
-    |> Enum.map(&(Range.size(&1)))
-    |> Enum.product
+    |> Map.values()
+    |> Enum.map(&Range.size(&1))
+    |> Enum.product()
   end
 
   def combine(rules) do
@@ -33,9 +33,9 @@ defmodule Main do
 
   def to_range({c, op, val}) do
     case op do
-      "<" -> {c, 1..(val-1)}
+      "<" -> {c, 1..(val - 1)}
       "<=" -> {c, 1..val}
-      ">" -> {c, (val+1)..4000}
+      ">" -> {c, (val + 1)..4000}
       ">=" -> {c, val..4000}
     end
   end
@@ -86,9 +86,10 @@ defmodule Main do
       end)
 
     [rule1 | rules] = rules
+
     Enum.reduce(rules, [rule1], fn {node, tests}, acc ->
-      prev_tests = acc |> List.last |> elem(1)
-      inv = prev_tests |> List.last |> invert
+      prev_tests = acc |> List.last() |> elem(1)
+      inv = prev_tests |> List.last() |> invert
       prev_tests = prev_tests |> List.delete_at(-1) |> Enum.concat([inv])
       tests = prev_tests ++ tests
       acc ++ [{node, tests}]
