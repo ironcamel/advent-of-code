@@ -2,10 +2,8 @@ defmodule Main do
   def main() do
     parse_input("input-large.txt")
     |> dfs()
-    |> Enum.map(&List.flatten(&1))
     |> Enum.map(fn rules -> Enum.map(rules, &to_range(&1)) end)
     |> Enum.map(fn rules -> combine(rules) end)
-    |> Enum.map(fn rules -> Map.new(rules) end)
     |> Enum.map(fn rule_map -> count_combos(rule_map) end)
     |> Enum.sum()
   end
@@ -29,6 +27,7 @@ defmodule Main do
       end)
       |> then(fn rule -> [rule | acc] end)
     end)
+    |> Map.new()
   end
 
   def to_range({c, op, val}) do
@@ -49,9 +48,8 @@ defmodule Main do
 
     workflows[node]
     |> Enum.reject(fn {n, _} -> MapSet.member?(visited, n) end)
-    |> Enum.flat_map(fn {child, tests} ->
-      dfs(workflows, child, visited, [tests | path])
-    end)
+    |> Enum.flat_map(fn {child, tests} -> dfs(workflows, child, visited, [tests | path]) end)
+    |> Enum.map(&List.flatten(&1))
   end
 
   def invert({c, "<", val}), do: {c, ">=", val}
