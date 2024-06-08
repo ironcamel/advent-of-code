@@ -4,7 +4,7 @@ defmodule Main do
     |> parse_input()
     |> Enum.map(fn row -> round(Enum.sum(row) / length(row)) end)
     |> then(fn gamma ->
-      eps = Enum.map(gamma, fn n -> if n == 1, do: 0, else: 1 end)
+      eps = Enum.map(gamma, &abs(&1 - 1))
       to_i(gamma) * to_i(eps)
     end)
   end
