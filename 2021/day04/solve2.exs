@@ -26,19 +26,29 @@ defmodule Main do
           Enum.any?(0..4, fn j -> board[{:col_count, j}] == 5 end)
       end)
 
-    if winner do
-      all_sum =
-        winner
-        |> Enum.filter(fn
-          {k, {_i, _j}} when is_integer(k) -> true
-          _ -> false
-        end)
-        |> Enum.map(fn {k, _v} -> k end)
-        |> Enum.sum()
+    cond do
+      winner && length(boards) == 1 ->
+        all_sum =
+          winner
+          |> Enum.filter(fn
+            {k, {_i, _j}} when is_integer(k) -> true
+            _ -> false
+          end)
+          |> Enum.map(fn {k, _v} -> k end)
+          |> Enum.sum()
 
-      (all_sum - Enum.sum(Map.keys(winner.picked))) * num
-    else
-      draw_num(nums, boards)
+        (all_sum - Enum.sum(Map.keys(winner.picked))) * num
+
+      winner ->
+        boards =
+          Enum.reject(boards, fn board ->
+            Enum.any?(0..4, fn i -> board[{:row_count, i}] == 5 end) or
+              Enum.any?(0..4, fn j -> board[{:col_count, j}] == 5 end)
+          end)
+        draw_num(nums, boards)
+
+      true ->
+        draw_num(nums, boards)
     end
   end
 
@@ -77,5 +87,5 @@ end
 
 Main.main() |> IO.puts()
 
-# 4512 - input-small.txt answer
-# 10680 - input-large.txt answer
+# 1924 - input-small.txt answer
+# 31892 - input-large.txt answer
