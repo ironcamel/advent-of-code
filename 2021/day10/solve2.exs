@@ -2,20 +2,42 @@ defmodule Main do
   def main() do
     "input-large.txt"
     |> parse_input()
-    |> Enum.map(&parse_line/1)
-    |> Enum.map(fn c ->
-      case c do
-        ")" -> 3
-        "]" -> 57
-        "}" -> 1197
-        ">" -> 25137
-        _ -> 0
-      end
+    |> Enum.filter(&check_line/1)
+    |> Enum.map(fn line ->
+      line
+      |> Enum.reduce([], fn c, acc ->
+        if c in ["(", "[", "{", "<"] do
+          [c | acc]
+        else
+          tl(acc)
+        end
+      end)
+      |> Enum.map(fn
+        "(" -> ")"
+        "[" -> "]"
+        "{" -> "}"
+        "<" -> ">"
+      end)
+      |> Enum.reduce(0, fn c, acc ->
+        val =
+          case c do
+            ")" -> 1
+            "]" -> 2
+            "}" -> 3
+            ">" -> 4
+          end
+
+        acc * 5 + val
+      end)
     end)
-    |> Enum.sum()
+    |> Enum.sort()
+    |> then(fn vals ->
+      idx = div(length(vals), 2)
+      Enum.at(vals, idx)
+    end)
   end
 
-  def parse_line(line) do
+  def check_line(line) do
     Enum.reduce_while(line, [], fn c, acc ->
       if c in ~w|( [ { <| do
         {:cont, [c | acc]}
@@ -25,28 +47,28 @@ defmodule Main do
             if hd(acc) == "(" do
               {:cont, tl(acc)}
             else
-              {:halt, c}
+              {:halt, false}
             end
 
           "]" ->
             if hd(acc) == "[" do
               {:cont, tl(acc)}
             else
-              {:halt, c}
+              {:halt, false}
             end
 
           "}" ->
             if hd(acc) == "{" do
               {:cont, tl(acc)}
             else
-              {:halt, c}
+              {:halt, false}
             end
 
           ">" ->
             if hd(acc) == "<" do
               {:cont, tl(acc)}
             else
-              {:halt, c}
+              {:halt, false}
             end
         end
       end
@@ -63,5 +85,5 @@ end
 
 Main.main() |> IO.puts()
 
-# 26397 - input-small.txt answer
-# 323691 - input-large.txt answer
+# 288957 - input-small.txt answer
+# 2858785164 - input-large.txt answer
