@@ -3,8 +3,8 @@ defmodule Main do
 
   def main() do
     data = "input-large.txt" |> parse_input()
-
     num_rounds = 100
+
     {_data, cnt} =
       Enum.reduce(1..num_rounds, {data, 0}, fn _i, {data, cnt} ->
         {data, num_flashes} = flash(data)
@@ -19,7 +19,7 @@ defmodule Main do
   def flash(data, seen \\ %{}, total_flashes \\ 0, cnt \\ nil)
 
   def flash(data, _seen, total_flashes, 0) do
-    data = 
+    data =
       data
       |> Enum.map(fn {pos, val} -> if val > 9, do: {pos, 0}, else: {pos, val} end)
       |> Map.new()
@@ -45,7 +45,8 @@ defmodule Main do
     data =
       flashes
       |> Enum.flat_map(fn {pos, _val} ->
-        @unit_circle |> Enum.map(fn delta -> add_delta(pos, delta) end)
+        @unit_circle
+        |> Enum.map(fn delta -> add_delta(pos, delta) end)
         |> Enum.filter(fn pos -> data[pos] end)
       end)
       |> Enum.frequencies()
@@ -66,23 +67,9 @@ defmodule Main do
       line
       |> String.codepoints()
       |> Enum.with_index()
-      |> Enum.map(fn {val, j} ->
-        #node = %{val: String.to_integer(val), flashed: false}
-        {{i, j}, String.to_integer(val)}
-      end)
+      |> Enum.map(fn {val, j} -> {{i, j}, String.to_integer(val)} end)
     end)
     |> Map.new()
-  end
-
-  def print(data) do
-    IO.puts("---")
-    for i <- 0..9 do
-      0..9
-      |> Enum.map(fn j -> data[{i, j}] end)
-      |> Enum.join()
-      |> IO.puts()
-    end
-    data
   end
 end
 
