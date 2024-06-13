@@ -1,12 +1,7 @@
 defmodule Main do
   def main() do
-    # "input-large.txt"
-    #graph = "input-small1.txt" |> parse_input()
-    #graph = "input-small2.txt" |> parse_input()
-    #graph = "input-small3.txt" |> parse_input()
-    graph = "input-large.txt" |> parse_input()
-
-    graph
+    "input-large.txt"
+    |> parse_input()
     |> prune()
     |> search("start")
     |> length
@@ -20,7 +15,6 @@ defmodule Main do
   end
 
   def search(graph, node, visited_set, visited_list, paths) do
-    # dbg()
     visited_list = [node | visited_list]
     visited_set = MapSet.put(visited_set, node)
 
@@ -72,13 +66,9 @@ defmodule Main do
       |> put_in([Access.key(node2, %{}), node1], true)
     end)
   end
-
-  def p(o, opts \\ []) do
-    IO.inspect(o, [charlists: :as_lists, limit: :infinity] ++ opts)
-  end
 end
 
-Main.main() |> Main.p()
+Main.main() |> IO.puts()
 
 # 10 - input-small1.txt answer
 # 19 - input-small2.txt answer
