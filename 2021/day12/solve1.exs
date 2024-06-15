@@ -33,16 +33,14 @@ defmodule Main do
 
   def prune(graph) do
     pruned =
-      graph
-      |> Enum.reject(fn {_key, nodes} ->
-        map_size(nodes) == 1 and Map.keys(nodes) |> hd |> to_charlist |> hd >= ?a
+      Map.reject(graph, fn {_key, nodes} ->
+        map_size(nodes) == 1 and Map.keys(nodes) |> hd |> lower_case?()
       end)
-      |> Map.new()
 
     pruned =
       pruned
       |> Enum.map(fn {key, nodes} ->
-        nodes = nodes |> Enum.filter(fn {key, _val} -> pruned[key] end) |> Map.new()
+        nodes = Map.filter(nodes, fn {key, _val} -> pruned[key] end)
         {key, nodes}
       end)
       |> Map.new()
