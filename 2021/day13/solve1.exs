@@ -1,7 +1,6 @@
 defmodule Main do
   def main() do
-    #{paper, folds} = "input-small.txt" |> parse_input()
-    {paper, folds} = "input-large.txt" |> parse_input()
+    {paper, folds} = parse_input("input-large.txt")
     paper |> fold(hd(folds)) |> map_size
   end
 
@@ -51,13 +50,9 @@ defmodule Main do
 
     {paper, folds}
   end
-
-  def p(o, opts \\ []) do
-    IO.inspect(o, [charlists: :as_lists, limit: :infinity] ++ opts)
-  end
 end
 
-Main.main() |> Main.p()
+Main.main() |> IO.puts()
 
 # 17 - input-small.txt answer
 # 664 - input-large.txt answer
