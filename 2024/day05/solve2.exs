@@ -16,7 +16,7 @@ defmodule Main do
   def parse_input(path) do
     [part1, part2] = path |> File.read!() |> String.trim() |> String.split("\n\n")
     rules = part1 |> String.split("\n") |> Enum.map(&String.split(&1, "|")) |> MapSet.new()
-    rows = part2 |> String.split("\n") |> Enum.map(fn s -> String.split(s, ",") end)
+    rows  = part2 |> String.split("\n") |> Enum.map(&String.split(&1, ","))
     {rules, rows}
   end
 end
