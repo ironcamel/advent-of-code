@@ -5,8 +5,7 @@ defmodule Main do
     rows
     |> Enum.reject(fn row -> check_row(row, rules) end)
     |> Enum.map(fn row -> order_row(row, rules) end)
-    |> Enum.map(fn row -> Enum.at(row, div(length(row) - 1, 2)) end)
-    |> Enum.map(&String.to_integer/1)
+    |> Enum.map(fn row -> row |> Enum.at(div(length(row) - 1, 2)) |> String.to_integer() end)
     |> Enum.sum()
   end
 
