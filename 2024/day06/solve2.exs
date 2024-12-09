@@ -32,23 +32,15 @@ defmodule Main do
 
   def add_points({i1, j1}, {i2, j2}), do: {i1 + i2, j1 + j2}
 
-  def dir_vector(dir) do
-    case dir do
-      :n -> {-1, 0}
-      :e -> {0, 1}
-      :s -> {1, 0}
-      :w -> {0, -1}
-    end
-  end
+  def dir_vector(:n), do: {-1, 0}
+  def dir_vector(:s), do: {1, 0}
+  def dir_vector(:e), do: {0, 1}
+  def dir_vector(:w), do: {0, -1}
 
-  def turn_right(dir) do
-    case dir do
-      :n -> :e
-      :e -> :s
-      :s -> :w
-      :w -> :n
-    end
-  end
+  def turn_right(:n), do: :e
+  def turn_right(:s), do: :w
+  def turn_right(:e), do: :s
+  def turn_right(:w), do: :n
 
   def parse_input(path) do
     path
