@@ -6,23 +6,20 @@ defmodule Main do
 
     map
     |> Enum.filter(fn {_p, v} -> v == 0 end)
-    |> Enum.map(fn {p, _v} -> search(map, [p], 0) end)
+    |> Enum.map(fn {p, _v} -> dfs(map, [p], 0) end)
     |> Enum.sum()
   end
 
-  def search(_map, [], paths), do: paths
+  def dfs(_map, [], paths), do: paths
 
-  def search(map, [point | points], paths) do
+  def dfs(map, [point | points], paths) do
     val = map[point]
+    paths = if val == 9, do: paths + 1, else: paths
 
-    if val == 9 do
-      search(map, points, paths + 1)
-    else
-      @unit_circle
-      |> Enum.map(fn dir -> add_points(point, dir) end)
-      |> Enum.filter(fn p -> map[p] && map[p] == val + 1 end)
-      |> then(fn next_points -> search(map, next_points ++ points, paths) end)
-    end
+    @unit_circle
+    |> Enum.map(fn dir -> add_points(point, dir) end)
+    |> Enum.filter(fn p -> map[p] && map[p] == val + 1 end)
+    |> then(fn next_points -> dfs(map, next_points ++ points, paths) end)
   end
 
   def add_points({i1, j1}, {i2, j2}), do: {i1 + i2, j1 + j2}
