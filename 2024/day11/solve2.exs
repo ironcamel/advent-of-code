@@ -7,9 +7,9 @@ defmodule Main do
       Enum.reduce(acc, %{}, fn {s, cnt}, acc ->
         Enum.reduce(blink(s), acc, fn s, acc ->
           if acc[s] do
-            Map.put(acc, s, acc[s] + 1 * cnt)
+            Map.put(acc, s, acc[s] + cnt)
           else
-            Map.put(acc, s, 1 * cnt)
+            Map.put(acc, s, cnt)
           end
         end)
       end)
