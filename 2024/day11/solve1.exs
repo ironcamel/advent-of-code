@@ -1,6 +1,6 @@
 defmodule Main do
   def main() do
-    stones = parse_input("input-large.txt")
+    stones = "input-large.txt" |> File.read!() |> String.split()
     1..25 |> Enum.reduce(stones, fn _i, acc -> Enum.flat_map(acc, &blink/1) end) |> Enum.count()
   end
 
@@ -14,8 +14,6 @@ defmodule Main do
       [(String.to_integer(s) * 2024) |> to_string()]
     end
   end
-
-  def parse_input(path), do: path |> File.read!() |> String.split()
 end
 
 Main.main() |> IO.puts()
