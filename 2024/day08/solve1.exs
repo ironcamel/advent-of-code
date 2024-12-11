@@ -1,37 +1,41 @@
 defmodule Main do
   def main() do
-    {freqs, graph, max_i, max_j} = parse_input("input-large.txt")
+    {ants, graph, max_i, max_j} = parse_input("input-large.txt")
 
-    freqs
-    |> Enum.flat_map(fn {freq, points} -> gen_antinodes(graph, freq, points, []) end)
+    ants
+    |> Enum.flat_map(fn {_freq, points} -> gen_antinodes(graph, points, []) end)
     |> Enum.uniq()
     |> Enum.count(fn {i, j} -> i >= 0 and i <= max_i and j >= 0 and j <= max_j end)
   end
 
-  def gen_antinodes(_graph, _freq, [], acc), do: acc
+  def gen_antinodes(_graph, [], acc), do: acc
 
-  def gen_antinodes(graph, freq, [point1 | points], acc) do
-    #dbg{point1, points}
+  def gen_antinodes(graph, [point1 | points], acc) do
     {i1, j1} = point1
+
     ants =
       points
       |> Enum.flat_map(fn {i2, j2} = point2 ->
         {dist_i, dist_j} = get_dist(point1, point2)
+
         {i3, i4} =
           if i1 <= i2 do
             {i1 - dist_i, i2 + dist_i}
           else
             {i1 + dist_i, i2 - dist_i}
           end
+
         {j3, j4} =
           if j1 <= j2 do
             {j1 - dist_j, j2 + dist_j}
           else
             {j1 + dist_j, j2 - dist_j}
           end
+
         [{i3, j3}, {i4, j4}]
       end)
-    gen_antinodes(graph, freq, points, acc ++ ants)
+
+    gen_antinodes(graph, points, acc ++ ants)
   end
 
   def add_points({i1, j1}, {i2, j2}), do: {i1 + i2, j1 + j2}
@@ -56,7 +60,6 @@ defmodule Main do
     lines =
       path
       |> File.read!()
-      |> String.trim()
       |> String.split("\n", trim: true)
 
     max_i = length(lines) - 1
@@ -65,7 +68,9 @@ defmodule Main do
     ants =
       graph
       |> Enum.reduce(%{}, fn
-        {_pos, "."}, acc -> acc
+        {_pos, "."}, acc ->
+          acc
+
         {pos, val}, acc ->
           if acc[val] do
             Map.put(acc, val, [pos | acc[val]])
@@ -76,13 +81,9 @@ defmodule Main do
 
     {ants, graph, max_i, max_j}
   end
-
-  def p(o, opts \\ []) do
-    IO.inspect(o, [charlists: :as_lists, limit: :infinity] ++ opts)
-  end
 end
 
-Main.main() |> Main.p()
+Main.main() |> IO.puts()
 
 # 14 - input-small.txt answer
 # 367 - input-large.txt answer

@@ -1,15 +1,9 @@
 defmodule Main do
   def main() do
-    # "input-large.txt"
-    #{freqs, graph, max_i, max_j} = "input-small.txt" |> parse_input()
-    {freqs, graph, max_i, max_j} = "input-large.txt" |> parse_input()
-    #{freqs, graph, max_i, max_j} = "foo.txt" |> parse_input()
+    {ants, max_i, max_j} = parse_input("input-large.txt")
 
-    freqs
-    #|> dbg
-    |> Enum.flat_map(fn {freq, points} ->
-      gen_antinodes(points, max_i, max_j, [])
-    end)
+    ants
+    |> Enum.flat_map(fn {_freq, points} -> gen_antinodes(points, max_i, max_j, []) end)
     |> Enum.uniq()
     |> Enum.count(fn {i, j} -> i >= 0 and i <= max_i and j >= 0 and j <= max_j end)
   end
@@ -17,27 +11,30 @@ defmodule Main do
   def gen_antinodes([], _, _, acc), do: acc
 
   def gen_antinodes([point1 | points], max_i, max_j, acc) do
-    #dbg{point1, points}
     {i1, j1} = point1
+
     ants =
       points
       |> Enum.flat_map(fn {i2, j2} = point2 ->
         {dist_i, dist_j} = get_dist(point1, point2)
+
         {i3, i4} =
           if i1 <= i2 do
             {Enum.to_list(i1..0//-dist_i), Enum.to_list(i2..max_i//dist_i)}
           else
             {Enum.to_list(i1..max_i//dist_i), Enum.to_list(i2..0//-dist_i)}
           end
+
         {j3, j4} =
           if j1 <= j2 do
             {Enum.to_list(j1..0//-dist_j), Enum.to_list(j2..max_j//dist_j)}
           else
             {Enum.to_list(j1..max_j//dist_j), Enum.to_list(j2..0//-dist_j)}
           end
-        #[{i3, j3}, {i4, j4}]
+
         Enum.zip(i3, j3) ++ Enum.zip(i4, j4)
       end)
+
     gen_antinodes(points, max_i, max_j, acc ++ ants)
   end
 
@@ -49,7 +46,6 @@ defmodule Main do
     graph =
       path
       |> File.read!()
-      |> String.trim()
       |> String.split("\n", trim: true)
       |> Enum.with_index()
       |> Enum.flat_map(fn {line, i} ->
@@ -72,7 +68,9 @@ defmodule Main do
     ants =
       graph
       |> Enum.reduce(%{}, fn
-        {_pos, "."}, acc -> acc
+        {_pos, "."}, acc ->
+          acc
+
         {pos, val}, acc ->
           if acc[val] do
             Map.put(acc, val, [pos | acc[val]])
@@ -81,14 +79,11 @@ defmodule Main do
           end
       end)
 
-    {ants, graph, max_i, max_j}
-  end
-
-  def p(o, opts \\ []) do
-    IO.inspect(o, [charlists: :as_lists, limit: :infinity] ++ opts)
+    {ants, max_i, max_j}
   end
 end
 
-Main.main() |> Main.p()
+Main.main() |> IO.puts()
 
 # 34 - input-small.txt answer
+# 1285 - input-large.txt answer
