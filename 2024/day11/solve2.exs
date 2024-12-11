@@ -30,11 +30,7 @@ defmodule Main do
   end
 
   def parse_input(path) do
-    path
-    |> File.read!()
-    |> String.trim()
-    |> String.split()
-    |> Enum.map(fn s -> {s, 1} end)
+    path |> File.read!() |> String.trim() |> String.split() |> Enum.map(fn s -> {s, 1} end)
   end
 end
 
