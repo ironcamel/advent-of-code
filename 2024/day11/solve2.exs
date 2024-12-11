@@ -22,7 +22,7 @@ defmodule Main do
 
   def blink(s) do
     if rem(String.length(s), 2) == 0 do
-      {s1, s2} = s |> String.split_at(div(String.length(s), 2))
+      {s1, s2} = String.split_at(s, div(String.length(s), 2))
       [s1 |> String.to_integer() |> to_string(), s2 |> String.to_integer() |> to_string()]
     else
       [(String.to_integer(s) * 2024) |> to_string()]
