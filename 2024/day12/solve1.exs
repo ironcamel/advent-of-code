@@ -6,11 +6,7 @@ defmodule Main do
 
     graph
     |> gen_regions()
-    |> Enum.map(fn region ->
-      area = MapSet.size(region)
-      perimeter = calc_perimeter(region, graph)
-      area * perimeter
-    end)
+    |> Enum.map(fn region -> MapSet.size(region) * calc_perimeter(region, graph) end)
     |> Enum.sum()
   end
 
