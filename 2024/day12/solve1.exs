@@ -2,16 +2,11 @@ defmodule Main do
   @unit_circle [{-1, 0}, {0, 1}, {1, 0}, {0, -1}]
 
   def main() do
-    #graph = parse_input("foo.txt")
-    #graph = parse_input("foo2.txt")
-    #graph = parse_input("input-small.txt")
     graph = parse_input("input-large.txt")
 
-    regions = gen_regions(graph)
-
-    regions
+    graph
+    |> gen_regions()
     |> Enum.map(fn region ->
-      #boundary = gen_boundary(region, graph)
       area = MapSet.size(region)
       perimeter = calc_perimeter(region, graph)
       area * perimeter
@@ -26,16 +21,6 @@ defmodule Main do
       else
         [dfs(graph, [point]) | acc]
       end
-    end)
-  end
-
-  def gen_boundary(region, graph) do
-    val = region |> Enum.take(1) |> then(&graph[&1])
-    region
-    |> Enum.filter(fn point ->
-      @unit_circle
-      |> Enum.map(fn dir -> add_points(dir, point) end)
-      |> Enum.any?(fn p -> graph[p] != val end)
     end)
   end
 
@@ -82,13 +67,9 @@ defmodule Main do
     end)
     |> Map.new()
   end
-
-  def p(o, opts \\ []) do
-    IO.inspect(o, [charlists: :as_lists, limit: :infinity] ++ opts)
-  end
 end
 
-Main.main() |> Main.p()
+Main.main() |> IO.puts()
 
 # 1930 - input-small.txt answer
 # 1494342 - input-large.txt answer
