@@ -67,8 +67,7 @@ defmodule Main do
   end
 
   def gen_boundary(region, graph, val) do
-    region
-    |> Enum.filter(fn point ->
+    Enum.filter(region, fn point ->
       @unit_circle
       |> Enum.map(fn dir -> add_points(dir, point) end)
       |> Enum.any?(fn p -> graph[p] != val end)
