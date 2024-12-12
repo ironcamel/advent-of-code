@@ -2,66 +2,44 @@ defmodule Main do
   @unit_circle [{-1, 0}, {0, 1}, {1, 0}, {0, -1}]
 
   def main() do
-    #graph = parse_input("foo.txt")
-    #graph = parse_input("foo2.txt")
-    #graph = parse_input("input-small.txt")
     graph = parse_input("input-large.txt")
 
-    # iterate over boundary
-    # store top, bottom, left, and right edges
-    # merge edges together
-
-    # AAA
-    # AAA
-    # AA
-    #
-    # 1 top edge, 1 left edge, 2 bottom edges, 2 right edges
-
-    regions = gen_regions(graph)
-
-    regions
+    graph
+    |> gen_regions()
     |> Enum.map(fn region ->
       val = region |> Enum.take(1) |> hd() |> then(&graph[&1])
-      #dbg(val)
       boundary = gen_boundary(region, graph, val)
-      area = MapSet.size(region)
-      #perimeter = calc_perimeter(region, graph)
-      #area * perimeter
-      sides = count_sides(boundary, graph, val)
-      area * sides
+      MapSet.size(region) * count_sides(boundary, graph, val)
     end)
     |> Enum.sum()
   end
 
   def count_sides(points, graph, val) do
-    #{min_i, max_i} = points |> Enum.map(fn {i, _j} -> i end) |> Enum.min_max()
-    #{min_j, max_j} = points |> Enum.map(fn {_i, j} -> j end) |> Enum.min_max()
-
     [:n, :e, :s, :w]
-    |> Enum.map(fn dir -> count_sides(points, graph, val, dir) end)
+    |> Enum.map(fn dir ->
+      points
+      |> Enum.filter(fn p -> get_adj(graph, p, dir) != val end)
+      |> count_sides(dir)
+      |> Enum.sum()
+    end)
     |> Enum.sum()
   end
 
-  def count_sides(points, graph, val, dir) when dir in [:n, :s] do
+  def count_sides(points, dir) when dir in [:n, :s] do
     points
-    |> Enum.filter(fn p -> get_dir(graph, p, dir) != val end)
     |> Enum.group_by(fn {i, _j} -> i end)
     |> Map.values()
     |> Enum.map(fn row -> row |> Enum.map(fn {_i, j} -> j end) |> reduce_vals() end)
-    |> Enum.sum()
   end
 
-  def count_sides(points, graph, val, dir) do
+  def count_sides(points, dir) when dir in [:e, :w] do
     points
-    |> Enum.filter(fn p -> get_dir(graph, p, dir) != val end)
     |> Enum.group_by(fn {_i, j} -> j end)
     |> Map.values()
     |> Enum.map(fn col -> col |> Enum.map(fn {i, _j} -> i end) |> reduce_vals() end)
-    |> Enum.sum()
   end
 
   def reduce_vals(vals) do
-    #dbg()
     vals
     |> Enum.sort()
     |> Enum.reduce([], fn n, acc ->
@@ -97,22 +75,10 @@ defmodule Main do
     end)
   end
 
-  def calc_perimeter(boundary, graph) do
-    val = boundary |> Enum.take(1) |> hd() |> then(&graph[&1])
-
-    boundary
-    |> Enum.map(fn point ->
-      @unit_circle
-      |> Enum.map(fn dir -> add_points(dir, point) end)
-      |> Enum.count(fn p -> graph[p] != val end)
-    end)
-    |> Enum.sum()
-  end
-
-  def get_dir(graph, point, :n), do: graph[add_points({-1, 0}, point)]
-  def get_dir(graph, point, :s), do: graph[add_points({1, 0}, point)]
-  def get_dir(graph, point, :e), do: graph[add_points({0, 1}, point)]
-  def get_dir(graph, point, :w), do: graph[add_points({0, -1}, point)]
+  def get_adj(graph, point, :n), do: graph[add_points({-1, 0}, point)]
+  def get_adj(graph, point, :s), do: graph[add_points({1, 0}, point)]
+  def get_adj(graph, point, :e), do: graph[add_points({0, 1}, point)]
+  def get_adj(graph, point, :w), do: graph[add_points({0, -1}, point)]
 
   def dfs(graph, nodes, visited \\ MapSet.new())
   def dfs(_graph, [], visited), do: visited
@@ -145,13 +111,9 @@ defmodule Main do
     end)
     |> Map.new()
   end
-
-  def p(o, opts \\ []) do
-    IO.inspect(o, [charlists: :as_lists, limit: :infinity] ++ opts)
-  end
 end
 
-Main.main() |> Main.p()
+Main.main() |> IO.puts()
 
 # 1206 - input-small.txt answer
 # 893676 - input-large.txt answer
