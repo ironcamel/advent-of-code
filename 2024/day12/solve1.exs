@@ -6,21 +6,15 @@ defmodule Main do
     #graph = parse_input("foo2.txt")
     #graph = parse_input("input-small.txt")
     graph = parse_input("input-large.txt")
-    #dbg(graph)
 
     regions = gen_regions(graph)
 
     regions
     |> Enum.map(fn region ->
-      val = region |> Enum.take(1) |> hd() |> then(&graph[&1])
-      dbg(val)
-      boundary = gen_boundary(region, graph)
-      #area = calc_area(boundary)
+      #boundary = gen_boundary(region, graph)
       area = MapSet.size(region)
-      perimeter = calc_perimeter(boundary, graph)
+      perimeter = calc_perimeter(region, graph)
       area * perimeter
-      #{val, area, perimeter}
-      #{val, area}
     end)
     |> Enum.sum()
   end
@@ -46,9 +40,10 @@ defmodule Main do
   end
 
   def calc_perimeter(boundary, graph) do
-    val = boundary |> hd() |> then(&graph[&1])
+    val = boundary |> Enum.take(1) |> hd() |> then(&graph[&1])
 
-    Enum.map(boundary, fn point ->
+    boundary
+    |> Enum.map(fn point ->
       @unit_circle
       |> Enum.map(fn dir -> add_points(dir, point) end)
       |> Enum.count(fn p -> graph[p] != val end)
@@ -57,7 +52,7 @@ defmodule Main do
   end
 
   def dfs(graph, nodes, visited \\ MapSet.new())
-  def dfs(graph, [], visited), do: visited
+  def dfs(_graph, [], visited), do: visited
 
   def dfs(graph, [node | nodes], visited) do
     visited = MapSet.put(visited, node)
@@ -72,23 +67,6 @@ defmodule Main do
   end
 
   def add_points({i1, j1}, {i2, j2}), do: {i1 + i2, j1 + j2}
-
-  def det({i1, j1}, {i2, j2}), do: i1 * j2 - i2 * j1
-
-  def calc_area([_]), do: 1
-
-  def calc_area(points) do
-    points
-    |> Enum.concat([hd(points)])
-    |> Enum.chunk_every(2, 1, :discard)
-    |> Enum.map(fn [p1, p2] -> det(p1, p2) end)
-    |> Enum.sum()
-    |> then(fn n -> abs(n) / 2 + length(points) / 2 + 1 end)
-    |> dbg
-  end
-
-  # def perimeter(points) do
-  # end
 
   def parse_input(path) do
     path
