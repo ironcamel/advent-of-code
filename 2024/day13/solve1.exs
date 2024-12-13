@@ -1,45 +1,23 @@
 defmodule Main do
   def main() do
-    # "input-large.txt"
-    #rules = parse_input("input-small.txt")
-    rules = parse_input("input-large.txt")
-    #rules = parse_input("foo.txt")
-
-    rules
-    |> Enum.map(fn rule ->
-      rule
-      |> gen_candidates()
-      |> Enum.map(fn {a, b} -> 3 * a + b end)
-      |> then(fn vals -> if length(vals) > 0, do: vals, else: [0] end)
-      |> Enum.min()
-    end)
+    "input-large.txt"
+    |> parse_input()
+    |> Enum.map(fn rule -> cramer(rule) end)
+    |> Enum.filter(fn {x, y} -> is_int(x) and is_int(y) end)
+    |> Enum.map(fn {a, b} -> 3 * a + b end)
     |> Enum.sum()
   end
 
-  def gen_candidates(%{a: a, b: b, c: c}) do
-
-    x_canditates =
-      0..div(c.x, a.x)
-      |> Enum.map(fn x1 ->
-        x2 = (c.x - x1 * a.x) / b.x
-        {x1, x2}
-      end)
-      |> Enum.filter(fn {_x1, x2} -> x2 == trunc(x2) end)
-      |> Enum.map(fn {x1, x2} -> {x1, trunc(x2)} end)
-      |> MapSet.new()
-
-    y_canditates =
-      0..div(c.y, a.y)
-      |> Enum.map(fn y1 ->
-        y2 = (c.y - y1 * a.y) / b.y
-        {y1, y2}
-      end)
-      |> Enum.filter(fn {_y1, y2} -> y2 == trunc(y2) end)
-      |> Enum.map(fn {y1, y2} -> {y1, trunc(y2)} end)
-      |> MapSet.new()
-
-    MapSet.intersection(x_canditates, y_canditates)
+  def cramer(%{a: a, b: b, c: c}) do
+    d = det([a.x, b.x], [a.y, b.y])
+    dx = det([c.x, b.x], [c.y, b.y])
+    dy = det([a.x, c.x], [a.y, c.y])
+    {dx / d, dy / d}
   end
+
+  def det([i1, j1], [i2, j2]), do: i1 * j2 - i2 * j1
+
+  def is_int(n), do: n == trunc(n)
 
   def parse_input(path) do
     path
@@ -59,13 +37,9 @@ defmodule Main do
       }
     end)
   end
-
-  def p(o, opts \\ []) do
-    IO.inspect(o, [charlists: :as_lists, limit: :infinity] ++ opts)
-  end
 end
 
-Main.main() |> Main.p()
+Main.main() |> IO.puts()
 
 # 480 - input-small.txt answer
 # 25629 - input-large.txt answer

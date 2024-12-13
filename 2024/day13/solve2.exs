@@ -1,5 +1,5 @@
 defmodule Main do
-  @offset 10000000000000
+  @offset 1.0e13
 
   def main() do
     "input-large.txt"
@@ -11,18 +11,9 @@ defmodule Main do
   end
 
   def cramer(%{a: a, b: b, c: c}) do
-    d = det(
-      [a.x, b.x],
-      [a.y, b.y]
-    )
-    dx = det(
-      [c.x, b.x],
-      [c.y, b.y]
-    )
-    dy = det(
-      [a.x, c.x],
-      [a.y, c.y]
-    )
+    d = det([a.x, b.x], [a.y, b.y])
+    dx = det([c.x, b.x], [c.y, b.y])
+    dy = det([a.x, c.x], [a.y, c.y])
     {dx / d, dy / d}
   end
 
@@ -31,7 +22,6 @@ defmodule Main do
   def is_int(n), do: n == trunc(n)
 
   def parse_input(path) do
-
     path
     |> File.read!()
     |> String.trim()
@@ -49,13 +39,9 @@ defmodule Main do
       }
     end)
   end
-
-  def p(o, opts \\ []) do
-    IO.inspect(o, [charlists: :as_lists, limit: :infinity] ++ opts)
-  end
 end
 
-Main.main() |> Main.p()
+Main.main() |> IO.puts()
 
 # 875318608908 - input-small.txt answer
 # 107487112929999 - input-large.txt answer
