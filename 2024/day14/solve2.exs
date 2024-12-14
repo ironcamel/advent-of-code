@@ -3,14 +3,13 @@ defmodule Main do
   @width 101
 
   def main() do
-    grid = "input-large.txt" |> parse_input()
+    grid = parse_input("input-large.txt")
 
-    n =
-      #1..10_000
-      8200..10_000
-      |> Enum.find(fn n ->
-        grid = move_robots(grid, n)
+    # find number of steps until there are 20 or more consecutive robots in a column
+    Stream.map(1..10_000, fn n ->
+      grid = move_robots(grid, n)
 
+      found_col =
         Enum.any?(0..(@width - 1), fn j ->
           grid
           |> Map.keys()
@@ -18,15 +17,17 @@ defmodule Main do
           |> Enum.map(fn {i1, _j1} -> i1 end)
           |> Enum.sort()
           |> Enum.chunk_every(2, 1, :discard)
-          |> Enum.map(fn [i1, i2] -> i2 - i1 end)
-          |> Enum.chunk_by(fn n -> n end)
-          |> Enum.map(&length(&1))
-          |> Enum.any?(&(&1 >= 20))
+          |> Enum.chunk_by(fn [i1, i2] -> i2 - i1 end)
+          |> Enum.any?(fn chunk -> length(chunk) >= 20 end)
         end)
-      end)
 
-    grid |> move_robots(n) |> print()
-    IO.puts(n)
+      if found_col, do: {grid, n}, else: nil
+    end)
+    |> Enum.find(& &1)
+    |> then(fn {grid, n} ->
+      print(grid)
+      IO.puts(n)
+    end)
   end
 
   def print(grid) do
