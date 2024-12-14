@@ -34,7 +34,11 @@ defmodule Main do
         [j2, i2, x, y]
       end)
     end)
-    |> Enum.reduce(%{}, fn [j, i, x, y], acc ->
+    |> build_grid()
+  end
+
+  def build_grid(data) do
+    Enum.reduce(data, %{}, fn [j, i, x, y], acc ->
       robots = acc[{i, j}] || []
       Map.put(acc, {i, j}, [{x, y} | robots])
     end)
@@ -48,17 +52,10 @@ defmodule Main do
     |> Enum.map(fn line ->
       ~r/p=(.+),(\S+) v=(.+),(.+)/ |> Regex.run(line) |> tl() |> Enum.map(&String.to_integer/1)
     end)
-    |> Enum.reduce(%{}, fn [j, i, x, y], acc ->
-      robots = acc[{i, j}] || []
-      Map.put(acc, {i, j}, [{x, y} | robots])
-    end)
-  end
-
-  def p(o, opts \\ []) do
-    IO.inspect(o, [charlists: :as_lists, limit: :infinity] ++ opts)
+    |> build_grid()
   end
 end
 
-Main.main() |> Main.p()
+Main.main() |> IO.puts()
 
 # 230436441 - input-large.txt answer
