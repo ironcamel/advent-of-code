@@ -1,25 +1,12 @@
 defmodule Main do
-
   def main() do
-    # "input-large.txt"
-    #"input-small.txt"
-    #{grid, moves} = parse_input("foo.txt")
-    #{grid, moves} = parse_input("foo2.txt")
-    #{grid, moves} = parse_input("input-small.txt")
     {grid, moves} = parse_input("input-large.txt")
     max_ij = grid |> Map.keys() |> Enum.max()
-    robot_pos = grid |> Enum.find(fn {_, val} -> val == "@" end) |> elem(0)
-    print(grid)
-    get_boxes(grid, max_ij, ">", robot_pos)
+    robot = grid |> Enum.find(fn {_, val} -> val == "@" end) |> elem(0)
 
     moves
-    #|> Enum.take(13)
-    |> Enum.reduce({grid, robot_pos}, fn dir, {grid, robot} ->
-      #IO.puts(dir)
-
-      {grid, robot} = move(grid, max_ij, dir, robot)
-      #print(grid)
-      {grid, robot}
+    |> Enum.reduce({grid, robot}, fn dir, {grid, robot} ->
+      move(grid, max_ij, dir, robot)
     end)
     |> then(fn {grid, _} -> grid end)
     |> Enum.map(fn
@@ -27,18 +14,17 @@ defmodule Main do
       _ -> 0
     end)
     |> Enum.sum()
-
   end
 
   def move(grid, max_ij, dir, robot) do
     boxes = get_boxes(grid, max_ij, dir, robot)
-    move(grid, max_ij, dir, robot, boxes)
+    move_with_boxes(grid, dir, robot, boxes)
   end
 
-  def move(grid, max_ij, dir, robot, boxes) do
-    #{hi, hj} = if length(boxes), do: hd(boxes), else: robot
+  def move_with_boxes(grid, dir, robot, boxes) do
     head = if length(boxes) > 0, do: hd(boxes), else: robot
     object = grid[add_points(vector_for(dir), head)]
+
     if object == "#" do
       {grid, robot}
     else
@@ -53,10 +39,10 @@ defmodule Main do
     end
   end
 
-  def range_for("<", {i, j}, _max_ij), do: j-1..0//-1
-  def range_for(">", {i, j}, {_max_i, max_j}), do: j+1..max_j
-  def range_for("^", {i, j}, _max_ij), do: i-1..0//-1
-  def range_for("v", {i, j}, {max_i, _max_j}), do: i+1..max_i
+  def range_for("<", {_i, j}, _max_ij), do: (j - 1)..0//-1
+  def range_for(">", {_i, j}, {_max_i, max_j}), do: (j + 1)..max_j
+  def range_for("^", {i, _j}, _max_ij), do: (i - 1)..0//-1
+  def range_for("v", {i, _j}, {max_i, _max_j}), do: (i + 1)..max_i
 
   def vector_for("<"), do: {0, -1}
   def vector_for(">"), do: {0, 1}
@@ -71,7 +57,7 @@ defmodule Main do
     end)
   end
 
-  def get_boxes(grid, max_ij, dir, {ri, rj} = robot) do
+  def get_boxes(grid, max_ij, dir, robot) do
     dir
     |> apply_vector(robot, max_ij)
     |> Enum.reverse()
@@ -83,6 +69,7 @@ defmodule Main do
 
   def print(grid) do
     {max_i, max_j} = grid |> Map.keys() |> Enum.max()
+
     for i <- 0..max_i do
       0..max_j
       |> Enum.map(fn j -> grid[{i, j}] || " " end)
@@ -113,13 +100,9 @@ defmodule Main do
 
     {grid, moves}
   end
-
-  def p(o, opts \\ []) do
-    IO.inspect(o, [charlists: :as_lists, limit: :infinity] ++ opts)
-  end
 end
 
-Main.main() |> Main.p()
+Main.main() |> IO.puts()
 
 # 10092 - input-small.txt answer
 # 1436690 - input-large.txt answer
