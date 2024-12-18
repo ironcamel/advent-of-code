@@ -10,12 +10,9 @@ defmodule Main do
   @right_of %{@north => @east, @south => @west, @east => @south, @west => @north}
 
   def main() do
-    #grid = parse_input("input-small.txt")
-    #grid = parse_input("input-small2.txt")
     grid = parse_input("input-large.txt")
     {start, _} = Enum.find(grid, fn {_k, v} -> v == "S" end)
     {target, _} = Enum.find(grid, fn {_k, v} -> v == "E" end)
-
     {dist, prev} = dijkstra(grid, start, target)
 
     {_score, dir} =
@@ -23,22 +20,10 @@ defmodule Main do
       |> Enum.map(fn dir -> {dist[{target, dir}], dir} end)
       |> Enum.min()
 
-    target_node = {target, dir}
-    #node = {{1, 139}, {-1, 0}}
-
-    prev = prev |> Enum.map(fn {node, nodes} -> {node, Enum.uniq(nodes)} end) |> Map.new()
-    dfs(prev, [target_node])
+    dfs(prev, [{target, dir}])
     |> Enum.map(fn {pos, _dir} -> pos end)
     |> Enum.uniq()
     |> Enum.count()
-    #|> dbg()
-
-    #walk_back(dist, prev, target, start)
-    #|> Enum.map(fn {pos, _dir} -> pos end)
-    #|> Enum.uniq()
-    #|> Enum.count()
-    #|> dbg()
-    #print(grid, path)
   end
 
   def dfs(prev, nodes, visited \\ MapSet.new())
@@ -46,9 +31,8 @@ defmodule Main do
 
   def dfs(prev, [node | nodes], visited) do
     visited = MapSet.put(visited, node)
-    next_nodes = prev[node] || []
+    next_nodes = MapSet.to_list(prev[node] || MapSet.new())
     dfs(prev, next_nodes ++ nodes, visited)
-    #dbg()
   end
 
   def dijkstra(grid, start, target) do
@@ -58,15 +42,14 @@ defmodule Main do
     visited = MapSet.new()
     nodes = Heap.new() |> Heap.push({0, start_node})
     dijkstra(grid, nodes, visited, dist, prev, target)
-
   end
 
   def dijkstra(grid, nodes, visited, dist, prev, target) do
-    #if pos == target do
-    if Heap.empty?(nodes) do
+    {_score, {pos, dir} = node} = Heap.root(nodes)
+
+    if pos == target do
       {dist, prev}
     else
-      {_score, {pos, dir} = node} = Heap.root(nodes)
       nodes = Heap.pop(nodes)
       visited = MapSet.put(visited, node)
       straight_pos = add_points(pos, dir)
@@ -75,7 +58,7 @@ defmodule Main do
         [
           {{straight_pos, dir}, 1},
           {{pos, @left_of[dir]}, 1000},
-          {{pos, @right_of[dir]}, 1000},
+          {{pos, @right_of[dir]}, 1000}
         ]
         |> Enum.reject(fn {{pos, _dir} = node, _cost} ->
           MapSet.member?(visited, node) or grid[pos] == "#"
@@ -101,13 +84,15 @@ defmodule Main do
       cond do
         !dist[node2] or val < dist[node2] ->
           dist = Map.put(dist, node2, val)
-          prev = Map.put(prev, node2, [node1])
-          #prev = Map.put(prev, node2, node1)
+          prev = Map.put(prev, node2, MapSet.new([node1]))
           {dist, prev}
+
         val == dist[node2] ->
           dist = Map.put(dist, node2, val)
-          prev = Map.put(prev, node2, [node1 | Map.get(prev, node2, [])])
+          prev_nodes = prev |> Map.get(node2, MapSet.new()) |> MapSet.put(node1)
+          prev = Map.put(prev, node2, prev_nodes)
           {dist, prev}
+
         true ->
           {dist, prev}
       end
@@ -119,7 +104,6 @@ defmodule Main do
   def parse_input(path) do
     path
     |> File.read!()
-    |> String.trim()
     |> String.split("\n", trim: true)
     |> Enum.with_index()
     |> Enum.flat_map(fn {line, i} ->
@@ -134,6 +118,7 @@ defmodule Main do
 
   def print(grid, path) do
     path = MapSet.new(path)
+
     for i <- 0..140 do
       0..140
       |> Enum.map(fn j ->
@@ -147,13 +132,9 @@ defmodule Main do
       |> IO.puts()
     end
   end
-
-  def p(o, opts \\ []) do
-    IO.inspect(o, [charlists: :as_lists, limit: :infinity] ++ opts)
-  end
 end
 
-Main.main() |> Main.p()
+Main.main() |> IO.puts()
 
 # 45 - input-small.txt answer
 # 64 - input-small2.txt answer
