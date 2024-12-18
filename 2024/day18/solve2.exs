@@ -4,58 +4,49 @@ defmodule Main do
   @south {1, 0}
   @west {0, -1}
   @unit_circle [@north, @south, @east, @west]
-  #@max_i 6
-  @max_i 70
-  @max_j @max_i
-  @range_i 0..@max_i
-  @range_j 0..@max_j
-  @target {@max_i, @max_i}
 
   def main() do
-    
     bytes = parse_input("input-large.txt")
-    #bytes = parse_input("input-small.txt")
+    max_i = bytes |> Enum.map(fn {i, _j} -> i end) |> Enum.max()
+    max_j = bytes |> Enum.map(fn {_i, j} -> j end) |> Enum.max()
+    target = {max_i, max_j}
     {bytes1, bytes2} = Enum.split(bytes, 1024)
-    #{bytes1, bytes2} = Enum.split(bytes, 12)
+    #{bytes1, bytes2} = Enum.split(bytes, 2898)
     graph = bytes1 |> Enum.map(fn p -> {p, "#"} end) |> Map.new()
-    process(graph, bytes2)
+    process(graph, bytes2, target)
   end
 
-  def process(graph, [{i, j} = point | points]) do
+  def process(graph, [{i, j} = point | points], target) do
     graph = Map.put(graph, point, "#")
-    if bfs(graph, [{{0, 0}, 0}], @target) == -1 do
+
+    if bfs(graph, [{0, 0}], target) == :no_exit do
       "#{j},#{i}"
     else
-      process(graph, points)
+      process(graph, points, target)
     end
   end
 
   def bfs(graph, nodes, target, visited \\ MapSet.new())
-  def bfs(_graph, [], _target, _visited), do: -1
+  def bfs(_graph, [], _target, _visited), do: :no_exit
+  def bfs(_graph, [pos | _nodes], target, _visited) when pos == target, do: :found_exit
 
-  def bfs(_graph, [{pos, depth} | _nodes], target, _visited) when pos == target, do: depth
-
-  def bfs(graph, [{pos, _depth} = node | nodes], target, visited) do
-    if MapSet.member?(visited, pos) do
+  def bfs(graph, [node | nodes], target, visited) do
+    if MapSet.member?(visited, node) do
       bfs2(graph, nodes, target, visited)
     else
       bfs2(graph, [node | nodes], target, visited)
     end
   end
 
-  def bfs2(graph, [{pos, depth} | nodes], target, visited) do
-    #dbg pos: pos, depth: depth, visited: visited, nodes: nodes
-    visited = MapSet.put(visited, pos)
+  def bfs2(graph, [node | nodes], {max_i, max_j} = target, visited) do
+    visited = MapSet.put(visited, node)
 
     next_nodes =
       @unit_circle
-      |> Enum.map(fn dir -> add_points(dir, pos) end)
+      |> Enum.map(fn dir -> add_points(dir, node) end)
       |> Enum.filter(fn {i, j} = p ->
-        not MapSet.member?(visited, p)
-        and graph[p] != "#"
-        and i in @range_i and j in @range_j
+        not MapSet.member?(visited, p) and graph[p] != "#" and i in 0..max_i and j in 0..max_j
       end)
-      |> Enum.map(fn pos -> {pos, depth + 1} end)
 
     bfs(graph, nodes ++ next_nodes, target, visited)
   end
