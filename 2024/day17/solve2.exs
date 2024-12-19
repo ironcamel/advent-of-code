@@ -1,68 +1,13 @@
 defmodule Main do
   def main() do
-    # {reg, opcodes} = parse_input("input-small.txt")
     {reg, opcodes} = parse_input("input-large.txt")
-    # {reg, opcodes} = parse_input("foo.txt")
-    dbg()
-
-    Enum.map(0..15, fn i ->
-      # Enum.find(1..1_000_000, fn j ->
-      #  out = run(%{reg | a: 2 ** (i*3) + j}, opcodes)
-      #  elem(out, i) == elem(opcodes, i)
-      # end)
-
-      Enum.map(0..7, fn j ->
-        [i, run(%{reg | a: 2 ** (i * 3) + j}, opcodes)]
-      end)
-    end)
-
-    a =
-      Enum.reduce(15..0//-1, 8 ** 15, fn i, acc ->
-        # dbg i
-        acc =
-          Enum.find(acc..(8 ** 16)//8 ** i, fn a ->
-            out = run(%{reg | a: a}, opcodes)
-            elem(out, i) == elem(opcodes, i)
-          end)
-
-        # dbg acc: acc, out: run(%{reg | a: acc}, opcodes)
-        acc
-      end)
-      |> dbg
-
-    #a = 107408875647753
-    #out = run(%{reg | a: a}, opcodes)
-    #foo(reg, opcodes, a)
-    foo(reg, opcodes, 8 ** 15)
-
-    #dbg Enum.reject(15..0//-1, fn i -> elem(opcodes, i) == elem(out, i) end)
-    #bad = Enum.reject(0..15, fn i -> elem(opcodes, i) == elem(out, i) end)
-    #dbg bad
-
-    #Enum.find(a..(8 ** 16)//(8**hd(bad)), fn a ->
-    #  out = run(%{reg | a: a}, opcodes)
-    #  #elem(out, i) == elem(opcodes, i)
-    #  dbg Enum.reject(0..15, fn i -> elem(opcodes, i) == elem(out, i) end)
-    #  out == opcodes
-    #end)
-
-    # Enum.map(8**16..8**16 + 512, fn a ->
-    #  [a, run(%{reg | a: a}, opcodes)]
-    # end)
-
-    # run(%{reg | a: 2 ** 5 + 2 ** 7}, opcodes)
+    search(reg, opcodes, 8 ** 15)
   end
 
-  def foo(reg, opcodes, a) do
+  def search(reg, opcodes, a) do
     out = run(%{reg | a: a}, opcodes)
-    #bad = Enum.reject(0..15, fn i -> elem(opcodes, i) == elem(out, i) end)
-    bad = Enum.reject(15..0, fn i -> elem(opcodes, i) == elem(out, i) end)
-    if out == opcodes do
-      a
-    else
-      dbg bad
-      foo(reg, opcodes, a + 8 ** hd(bad))
-    end
+    bad_i = Enum.find(15..0//-1, fn i -> elem(opcodes, i) != elem(out, i) end)
+    if bad_i, do: search(reg, opcodes, a + 8 ** bad_i), else: a
   end
 
   def run(reg, ops, out \\ [], i \\ 0)
@@ -138,12 +83,8 @@ defmodule Main do
 
     {reg, opcodes}
   end
-
-  def p(o, opts \\ []) do
-    IO.inspect(o, [charlists: :as_lists, limit: :infinity] ++ opts)
-  end
 end
 
-Main.main() |> Main.p()
+Main.main() |> IO.puts()
 
 # 107416870455451 - input-large.txt answer

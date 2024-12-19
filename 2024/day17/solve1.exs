@@ -1,6 +1,5 @@
 defmodule Main do
   def main() do
-    # {reg, opcodes} = parse_input("input-small.txt")
     {reg, opcodes} = parse_input("input-large.txt")
     run(reg, opcodes)
   end
@@ -9,11 +8,12 @@ defmodule Main do
   def run(_reg, ops, out, i) when i >= tuple_size(ops), do: Enum.join(out, ",")
 
   def run(reg, ops, out, i) do
-    {opcode, operand} = {elem(ops, i), elem(ops, i+1)}
+    {opcode, operand} = {elem(ops, i), elem(ops, i + 1)}
+
     case exec(reg, opcode, operand) do
-      val when is_list(val) -> run(reg, ops, out ++ val, i+2)
+      val when is_list(val) -> run(reg, ops, out ++ val, i + 2)
       val when is_integer(val) -> run(reg, ops, out, val)
-      reg -> run(reg, ops, out, i+2)
+      reg -> run(reg, ops, out, i + 2)
     end
   end
 
