@@ -23,7 +23,8 @@ defmodule Main do
 
   def calc_savings([point | points], dist_from_end, savings_map) do
     savings_map =
-      points_around(point)
+      point
+      |> points_around()
       |> Enum.filter(fn p -> dist_from_end[p] end)
       |> Enum.reduce(savings_map, fn p, acc ->
         old_savings = Map.get(acc, {point, p}, 0)
