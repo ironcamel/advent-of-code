@@ -8,58 +8,50 @@ defmodule Main do
     "input-large.txt"
     |> parse_input()
     |> Enum.map(fn code ->
-      n = code |> Enum.filter(fn c -> c =~ ~r/\d/ end) |> Enum.join() |> String.to_integer()
+      n = code |> Enum.filter(&(&1 =~ ~r/\d/)) |> Enum.join() |> String.to_integer()
 
       code
       |> enter_code()
-      |> Enum.map(fn code -> enter_code(code) end)
-      |> List.flatten()
-      |> Enum.map(fn code -> enter_code(code) end)
-      |> List.flatten()
-      |> Enum.map(&tuple_size/1)
+      |> Enum.flat_map(fn code -> enter_code(code) end)
+      |> Enum.flat_map(fn code -> enter_code(code) end)
+      |> Enum.map(&length/1)
       |> Enum.min()
       |> then(fn min -> min * n end)
     end)
     |> Enum.sum()
   end
 
-  def enter_code(code, path \\ [], cur \\ {3, 2})
-  def enter_code([], path, _cur), do: List.to_tuple(path)
+  def enter_code(code, paths \\ [[]], cur \\ pos_for("A"))
+  def enter_code([], paths, _cur), do: paths
 
-  def enter_code(code, path, cur) when is_tuple(code) do
-    enter_code(Tuple.to_list(code), path, cur)
-  end
-
-  def enter_code([c | code], path, {i0, j0} = cur) do
+  def enter_code([c | code], paths, {i0, j0} = cur) do
     {i1, j1} = new_pos = pos_for(c)
     vert_dist = i1 - i0
     horz_dist = j1 - j0
     vert_c = if vert_dist > 0, do: "v", else: "^"
     horz_c = if horz_dist > 0, do: ">", else: "<"
 
-    gen_buttons(abs(vert_dist), vert_c, abs(horz_dist), horz_c)
-    |> Enum.reject(fn buttons ->
-      buttons
-      |> Enum.reduce([cur], fn arrow, acc ->
-        new_pos = arrow |> arrow_to_dir() |> add_points(hd(acc))
-        [new_pos | acc]
+    paths =
+      gen_buttons(abs(vert_dist), vert_c, abs(horz_dist), horz_c)
+      |> Enum.reject(fn buttons ->
+        buttons
+        |> Enum.reduce([cur], fn arrow, acc ->
+          new_pos = arrow |> arrow_to_dir() |> add_points(hd(acc))
+          [new_pos | acc]
+        end)
+        |> Enum.any?(fn p -> p == pos_for(" ") end)
       end)
-      |> Enum.any?(fn p -> p == {3, 0} end)
-    end)
-    |> Enum.map(fn buttons ->
-      enter_code(code, path ++ buttons ++ ["A"], new_pos)
-    end)
-    |> List.flatten()
+      |> Enum.flat_map(fn buttons ->
+        Enum.map(paths, fn path -> path ++ buttons ++ ["A"] end)
+      end)
+
+    enter_code(code, paths, new_pos)
   end
 
-  def arrow_to_dir(arrow) do
-    case arrow do
-      "^" -> @north
-      ">" -> @east
-      "v" -> @south
-      "<" -> @west
-    end
-  end
+  def arrow_to_dir("^"), do: @north
+  def arrow_to_dir(">"), do: @east
+  def arrow_to_dir("v"), do: @south
+  def arrow_to_dir("<"), do: @west
 
   def gen_buttons(n1, c1, n2, c2) do
     [
@@ -86,6 +78,7 @@ defmodule Main do
       "<" -> {4, 0}
       "v" -> {4, 1}
       ">" -> {4, 2}
+      " " -> {3, 0}
     end
   end
 
@@ -93,10 +86,6 @@ defmodule Main do
 
   def parse_input(path) do
     path |> File.read!() |> String.split("\n", trim: true) |> Enum.map(&String.codepoints/1)
-  end
-
-  def p(o, opts \\ []) do
-    IO.inspect(o, [charlists: :as_lists, limit: :infinity] ++ opts)
   end
 end
 
