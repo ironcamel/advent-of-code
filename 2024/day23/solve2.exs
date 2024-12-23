@@ -4,9 +4,7 @@ defmodule Main do
 
     sets =
       graph
-      |> Enum.map(fn {k, v} ->
-        {k, MapSet.new([k | Map.keys(v)])}
-      end)
+      |> Enum.map(fn {k, v} -> {k, MapSet.new([k | Map.keys(v)])} end)
       |> Map.new()
 
     keys = Map.keys(graph)
@@ -32,7 +30,7 @@ defmodule Main do
     |> Enum.reverse()
     |> hd()
     |> then(fn {_, pairs} ->
-      pairs |> List.flatten |> Enum.uniq |> Enum.sort |> Enum.join(",")
+      pairs |> List.flatten() |> Enum.uniq() |> Enum.sort() |> Enum.join(",")
     end)
   end
 
@@ -41,28 +39,15 @@ defmodule Main do
     |> File.read!()
     |> String.split("\n", trim: true)
     |> Enum.reduce(%{}, fn line, graph ->
-      [a, b] = line |> String.split("-")
+      [a, b] = String.split(line, "-")
 
-      graph =
-        if graph[a] do
-          put_in(graph[a][b], true)
-        else
-          Map.put(graph, a, %{b => true})
-        end
-
-      if graph[b] do
-        put_in(graph[b][a], true)
-      else
-        Map.put(graph, b, %{a => true})
-      end
+      graph
+      |> put_in([Access.key(a, %{}), b], true)
+      |> put_in([Access.key(b, %{}), a], true)
     end)
-  end
-
-  def p(o, opts \\ []) do
-    IO.inspect(o, [charlists: :as_lists, limit: :infinity] ++ opts)
   end
 end
 
-Main.main() |> Main.p()
+Main.main() |> IO.puts()
 
 # cl,ei,fd,hc,ib,kq,kv,ky,rv,vf,wk,yx,zf - input-large.txt answer

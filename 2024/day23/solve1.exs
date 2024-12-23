@@ -1,13 +1,10 @@
 defmodule Main do
   def main() do
-    #graph = "input-small.txt" |> parse_input()
     graph = parse_input("input-large.txt")
 
     graph
     |> Map.keys()
-    |> Enum.filter(fn a ->
-      graph[a] |> Map.keys() |> length() >= 2
-    end)
+    |> Enum.filter(fn a -> graph[a] |> Map.keys() |> length() >= 2 end)
     |> Enum.reduce([], fn a, acc ->
       neighbors = Map.keys(graph[a])
 
@@ -17,9 +14,7 @@ defmodule Main do
       |> Enum.filter(fn {b, c} ->
         Enum.any?([a, b, c], fn d -> d =~ ~r/^t/ end) && graph[b][c]
       end)
-      |> Enum.map(fn {b, c} ->
-        MapSet.new([a, b, c])
-      end)
+      |> Enum.map(fn {b, c} -> MapSet.new([a, b, c]) end)
       |> then(fn triples -> triples ++ acc end)
     end)
     |> Enum.uniq()
@@ -31,29 +26,16 @@ defmodule Main do
     |> File.read!()
     |> String.split("\n", trim: true)
     |> Enum.reduce(%{}, fn line, graph ->
-      [a, b] = line |> String.split("-")
+      [a, b] = String.split(line, "-")
 
-      graph =
-        if graph[a] do
-          put_in(graph[a][b], true)
-        else
-          Map.put(graph, a, %{b => true})
-        end
-
-      if graph[b] do
-        put_in(graph[b][a], true)
-      else
-        Map.put(graph, b, %{a => true})
-      end
+      graph
+      |> put_in([Access.key(a, %{}), b], true)
+      |> put_in([Access.key(b, %{}), a], true)
     end)
-  end
-
-  def p(o, opts \\ []) do
-    IO.inspect(o, [charlists: :as_lists, limit: :infinity] ++ opts)
   end
 end
 
-Main.main() |> Main.p()
+Main.main() |> IO.puts()
 
 # 7 - input-small.txt answer
 # 1358 - input-large.txt answer
