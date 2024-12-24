@@ -1,6 +1,5 @@
 defmodule Main do
   def main() do
-    #{gates, wires} = parse_input("input-small.txt")
     {gates, wires} = parse_input("input-large.txt")
 
     gates
@@ -17,7 +16,7 @@ defmodule Main do
   end
 
   def resolve([], wires, gates) do
-    if wires |> Map.values |> Enum.any?(&(&1 == nil)) do
+    if wires |> Map.values() |> Enum.any?(&(&1 == nil)) do
       resolve(gates, wires, gates)
     else
       wires
@@ -48,9 +47,7 @@ defmodule Main do
 
     wires =
       gates
-      |> Enum.flat_map(fn {c, {a, _op, b}} ->
-        [{a, nil}, {b, nil}, {c, nil}]
-      end)
+      |> Enum.flat_map(fn {c, {a, _op, b}} -> [{a, nil}, {b, nil}, {c, nil}] end)
       |> Map.new()
 
     wires =
