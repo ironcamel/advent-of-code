@@ -1,16 +1,14 @@
 defmodule Main do
+  @mod 16_777_216
+
   def main() do
-    #numbers = parse_input("input-small.txt")
-    #numbers = parse_input("input-small2.txt")
     numbers = parse_input("input-large.txt")
 
     buyers =
       numbers
       |> Enum.map(fn n ->
-        1.2000
-        |> Enum.reduce([n], fn _, acc ->
-          [acc |> hd |> evolve() | acc]
-        end)
+        1..2000
+        |> Enum.reduce([n], fn _, acc -> [acc |> hd() |> evolve() | acc] end)
         |> Enum.reverse()
         |> Enum.map(fn n -> rem(n, 10) end)
         |> Enum.chunk_every(2, 1, :discard)
@@ -21,9 +19,9 @@ defmodule Main do
         |> Map.new()
       end)
 
-    all_changes = buyers |> Enum.flat_map(fn prices -> Map.keys(prices) end) |> MapSet.new()
-
-    all_changes
+    buyers
+    |> Enum.flat_map(fn prices -> Map.keys(prices) end)
+    |> Enum.uniq()
     |> Enum.map(fn changes ->
       buyers
       |> Enum.map(fn prices -> prices[changes] || 0 end)
@@ -33,16 +31,13 @@ defmodule Main do
   end
 
   def evolve(n) do
-    n = (n * 64) |> Bitwise.bxor(n) |> rem(16_777_216)
-    n = n |> div(32) |> trunc() |> Bitwise.bxor(n) |> rem(16_777_216)
-    (n * 2048) |> Bitwise.bxor(n) |> rem(16_777_216)
+    n = (n * 64) |> Bitwise.bxor(n) |> rem(@mod)
+    n = n |> div(32) |> trunc() |> Bitwise.bxor(n) |> rem(@mod)
+    (n * 2048) |> Bitwise.bxor(n) |> rem(@mod)
   end
 
   def parse_input(path) do
-    path
-    |> File.read!()
-    |> String.split("\n", trim: true)
-    |> Enum.map(&String.to_integer/1)
+    path |> File.read!() |> String.split("\n", trim: true) |> Enum.map(&String.to_integer/1)
   end
 end
 
