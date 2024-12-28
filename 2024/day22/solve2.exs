@@ -5,8 +5,7 @@ defmodule Main do
     numbers = parse_input("input-large.txt")
 
     buyers =
-      numbers
-      |> Enum.map(fn n ->
+      Enum.map(numbers, fn n ->
         1..2000
         |> Enum.reduce([n], fn _, acc -> [acc |> hd() |> evolve() | acc] end)
         |> Enum.reverse()
