@@ -1,19 +1,12 @@
 defmodule Main do
   def main() do
     {grid, moves} = parse_input("input-large.txt")
-    # _max_ij = grid |> Map.keys() |> Enum.max()
-    robot = grid |> Enum.find(fn {_, val} -> val == "@" end) |> elem(0)
-    # grid |> Enum.sort()
+    {robot, _} = grid |> Enum.find(fn {_, val} -> val == "@" end)
 
     Enum.reduce(moves, {grid, robot}, fn dir, {grid, robot} ->
       move(grid, robot, dir)
     end)
-    |> then(fn {grid, _} -> grid end)
-    |> Enum.map(fn
-      {{i, j}, "["} -> 100 * i + j
-      _ -> 0
-    end)
-    |> Enum.sum()
+    |> then(fn {grid, _} -> score(grid) end)
   end
 
   def move(grid, robot, dir) when dir in ["<", ">"] do
@@ -124,12 +117,11 @@ defmodule Main do
   def score(grid) do
     grid
     |> Enum.map(fn
-      {{i, j}, "O"} -> 100 * i + j
+      {{i, j}, "["} -> 100 * i + j
       _ -> 0
     end)
     |> Enum.sum()
   end
-
 
   def range_for("<", {_i, j}), do: (j - 1)..0//-1
   def range_for(">", {_i, j}), do: (j + 1)..99
