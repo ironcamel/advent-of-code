@@ -2,8 +2,14 @@ defmodule Main do
   def main() do
     {gates, wires} = parse_input("input-large.txt")
 
-    gates
-    |> resolve(wires)
+    0..45
+    |> Enum.map(fn i -> "z" <> String.pad_leading("#{i}", 2, "0") end)
+    |> Enum.reduce(wires, fn wire, acc -> resolve(gates, acc, wire) end)
+    |> wires_to_int()
+  end
+
+  def wires_to_int(wires) do
+    wires
     |> Enum.filter(fn {wire, _} -> String.starts_with?(wire, "z") end)
     |> Enum.sort(:desc)
     |> Enum.map(fn {_, val} -> if val, do: 1, else: 0 end)
@@ -11,31 +17,32 @@ defmodule Main do
     |> String.to_integer(2)
   end
 
-  def resolve(gates, wires) do
-    resolve(gates, wires, gates)
-  end
-
-  def resolve([], wires, gates) do
-    if wires |> Map.values() |> Enum.any?(&(&1 == nil)) do
-      resolve(gates, wires, gates)
-    else
+  def resolve(gates, wires, wire) do
+    if wires[wire] != nil do
       wires
+    else
+      {wire1, op, wire2} = gates[wire]
+      wires1 = resolve(gates, wires, wire1)
+      wires2 = resolve(gates, wires, wire2)
+      val = do_op(op, wires1[wire1], wires2[wire2])
+      wires1 |> Map.merge(wires2) |> Map.put(wire, val)
     end
   end
 
-  def resolve([gate | tail], wires, gates) do
-    {wire, {a, op, b}} = gate
-    wires = Map.put(wires, wire, do_op(op, wires[a], wires[b]))
-    resolve(tail, wires, gates)
-  end
-
-  def do_op(_op, a, b) when is_nil(a) or is_nil(b), do: nil
   def do_op("AND", a, b), do: a and b
   def do_op("OR", a, b), do: a or b
   def do_op("XOR", a, b), do: a != b
 
   def parse_input(path) do
     [part1, part2] = path |> File.read!() |> String.split("\n\n", trim: true)
+
+    wires =
+      part1
+      |> String.split("\n")
+      |> Enum.reduce(%{}, fn line, acc ->
+        [a, val] = String.split(line, ": ")
+        Map.put(acc, a, val == "1")
+      end)
 
     gates =
       part2
@@ -44,20 +51,7 @@ defmodule Main do
         [a, op, b, _, c] = String.split(line)
         {c, {a, op, b}}
       end)
-
-    wires =
-      gates
-      |> Enum.flat_map(fn {c, {a, _op, b}} -> [{a, nil}, {b, nil}, {c, nil}] end)
       |> Map.new()
-
-    wires =
-      part1
-      |> String.split("\n")
-      |> Enum.reduce(wires, fn line, wires ->
-        [a, val] = String.split(line, ": ")
-        val = if val == "1", do: true, else: false
-        Map.put(wires, a, val)
-      end)
 
     {gates, wires}
   end
