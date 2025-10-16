@@ -27,6 +27,20 @@ defmodule Main do
 
   def add_points({i1, j1}, {i2, j2}), do: {i1 + i2, j1 + j2}
 
+  def det({i1, j1}, {i2, j2}), do: i1 * j2 - i2 * j1
+
+  def calc_area([_]), do: 1
+
+  def calc_area(points) do
+    points
+    |> Enum.concat([hd(points)])
+    |> Enum.chunk_every(2, 1, :discard)
+    |> Enum.map(fn [p1, p2] -> det(p1, p2) end)
+    |> Enum.sum()
+    |> then(fn n -> abs(n) / 2 + length(points) / 2 + 1 end)
+    |> dbg
+  end
+
   def parse_input(path) do
     path
     |> File.read!()
