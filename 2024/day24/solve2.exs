@@ -44,9 +44,9 @@ defmodule Main do
     for i <- 0..44 do
       for j <- 0..44 do
         x = 1 <<< i
-        y = 1 <<< i
+        y = 1 <<< j
         ans = resolve(gates, init_wires(wires, x, y)) |> wires_to_int()
-        if ans != x + x do
+        if ans != x + y do
           IO.puts("i: #{i}, j: #{j}")
         end
       end
