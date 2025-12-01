@@ -8,8 +8,15 @@ defmodule Main do
 
   def rotate([{dir, distance} | tail], cur, count) do
     val = if dir == "L", do: cur - distance, else: cur + distance
-    inc = div(val, 100) |> abs()
-    inc = if val == 0 or (val < 0 and cur != 0), do: inc + 1, else: inc
+
+    inc =
+      cond do
+        val == 0 -> 1
+        val < 0 and cur != 0 -> 1
+        true -> 0
+      end
+
+    inc = inc + abs(div(val, 100))
     rotate(tail, Integer.mod(val, 100), count + inc)
   end
 
