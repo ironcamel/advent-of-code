@@ -28,9 +28,7 @@ defmodule Main do
       |> Enum.flat_map(fn {r1, r2} -> [r1, r2] end)
       |> MapSet.new()
 
-    ranges
-    |> Enum.filter(fn range -> not MapSet.member?(overlaps, range) end)
-    |> MapSet.new()
+    MapSet.difference(ranges, overlaps)
   end
 
   def join_overlaps(overlaps) do
