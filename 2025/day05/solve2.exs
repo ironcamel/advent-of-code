@@ -23,11 +23,7 @@ defmodule Main do
   end
 
   def remove_overlaps(ranges, overlaps) do
-    overlaps =
-      overlaps
-      |> Enum.flat_map(fn {r1, r2} -> [r1, r2] end)
-      |> MapSet.new()
-
+    overlaps = overlaps |> Enum.flat_map(fn {r1, r2} -> [r1, r2] end) |> MapSet.new()
     MapSet.difference(ranges, overlaps)
   end
 
