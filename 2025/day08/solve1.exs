@@ -1,3 +1,5 @@
+Mix.install([:heap])
+
 defmodule Main do
   def main() do
     #boxes = parse_input("input-small.txt")
@@ -5,39 +7,26 @@ defmodule Main do
 
     distances =
       for box1 <- boxes, box2 <- boxes, box1 != box2 do
-        d = dist(box1, box2)
-        [{{box1, box2}, d}, {{box2, box1}, d}]
+        Enum.sort([box1, box2])
       end
-      |> List.flatten()
-      |> Map.new()
-
-    # dist({162,817,812}, {425,690,689})
-    circuits = []
+      |> Enum.sort()
+      |> Enum.dedup()
+      |> Enum.map(fn [box1, box2] ->
+        {dist(box1, box2), box1, box2}
+      end)
+      |> Enum.into(Heap.min())
 
     {_, circuits} =
-      Enum.reduce(1..1000, {distances, circuits}, fn _i, acc ->
-      #Enum.reduce(1..4, {distances, circuits}, fn _i, acc ->
+      Enum.reduce(1..1000, {distances, []}, fn _i, acc ->
         {distances, circuits} = acc
-        min = distances |> Map.values() |> Enum.min()
-        {{box1, box2}, _} = distances |> Enum.find(fn {_k, v} -> v == min end)
+        {_min, box1, box2} = Heap.root(distances)
+        distances = Heap.pop(distances)
         set1 = Enum.find(circuits, MapSet.new(), fn set -> MapSet.member?(set, box1) end)
         set2 = Enum.find(circuits, MapSet.new(), fn set -> MapSet.member?(set, box2) end)
         circuits = Enum.reject(circuits, fn c -> c == set1 or c == set2 end)
         set1 = MapSet.put(set1, box1)
         set2 = MapSet.put(set2, box2)
         new_set = MapSet.union(set1, set2)
-
-        to_drop =
-          for box1 <- new_set, box2 <- new_set, box1 != box2 do
-            [
-              {box1, box2},
-              {box2, box1}
-            ]
-          end
-          |> List.flatten()
-
-        #distances = Map.drop(distances, to_drop)
-        distances = Map.drop(distances, [{box1, box2}, {box2, box1}])
         {distances, [new_set | circuits]}
       end)
 
@@ -75,6 +64,5 @@ end
 
 Main.main() |> Main.p()
 
-# elixir solve1.exs  102.44s user 4.46s system 102% cpu 1:44.00 total
 # 40 - input-small.txt answer
 # 57564 - input-large.txt answer
