@@ -2,9 +2,7 @@ defmodule Main do
   def main() do
     "input-large.txt"
     |> parse_input()
-    |> Enum.flat_map(fn {n1, n2} ->
-      Enum.filter(n1..n2, fn n -> matches(n) end)
-    end)
+    |> Enum.flat_map(fn {n1, n2} -> Enum.filter(n1..n2, &matches/1) end)
     |> Enum.sum()
   end
 
@@ -13,12 +11,8 @@ defmodule Main do
     len = String.length(s)
 
     Enum.any?(1..div(len, 2)//1, fn i ->
-      if rem(len, i) == 0 do
-        s1 = String.slice(s, 0, i)
-        List.duplicate(s1, div(len, i)) |> Enum.join() == s
-      else
-        false
-      end
+      s1 = String.slice(s, 0, i)
+      List.duplicate(s1, div(len, i)) |> Enum.join() == s
     end)
   end
 
