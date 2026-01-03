@@ -9,15 +9,15 @@ defmodule Main do
     |> Enum.map(fn {:ok, val} -> val end)
   end
 
-  def solve({n1, n2}), do: Enum.filter(n1..n2, &matches/1)
+  def solve({n1, n2}) do
+    Enum.filter(n1..n2, fn n ->
+      s = Integer.to_string(n)
+      len = String.length(s)
 
-  def matches(n) do
-    s = Integer.to_string(n)
-    len = String.length(s)
-
-    Enum.any?(1..div(len, 2)//1, fn i ->
-      s1 = String.slice(s, 0, i)
-      List.duplicate(s1, div(len, i)) |> Enum.join() == s
+      Enum.any?(1..div(len, 2)//1, fn i ->
+        s1 = String.slice(s, 0, i)
+        List.duplicate(s1, div(len, i)) |> Enum.join() == s
+      end)
     end)
   end
 
