@@ -1,10 +1,15 @@
 defmodule Main do
   def main() do
-    "input-large.txt"
-    |> parse_input()
-    |> Enum.flat_map(fn {n1, n2} -> Enum.filter(n1..n2, &matches/1) end)
-    |> Enum.sum()
+    "input-large.txt" |> parse_input() |> async() |> List.flatten() |> Enum.sum()
   end
+
+  def async(items) do
+    items
+    |> Task.async_stream(&solve/1, max_concurrency: 200, ordered: false)
+    |> Enum.map(fn {:ok, val} -> val end)
+  end
+
+  def solve({n1, n2}), do: Enum.filter(n1..n2, &matches/1)
 
   def matches(n) do
     s = Integer.to_string(n)
